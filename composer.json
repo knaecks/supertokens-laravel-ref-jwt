@@ -1,0 +1,15 @@
+{
+    "name": "supertokens/supertokens-laravel-ref-jwt",
+    "description": "Implementation of session management using Laravel framework with JWT and refresh tokens",
+    "type": "library",
+    "license": "ISC",
+    "minimum-stability": "dev",
+    "require": {
+        "illuminate/database": "^5.9@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "SuperTokens\\Laravel\\": "app"
+        }
+    }
+}
