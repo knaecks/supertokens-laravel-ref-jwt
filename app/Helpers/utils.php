@@ -95,4 +95,18 @@ class Utils {
         }
         return;
     }
+
+    public static function serializeData($data) {
+        if (!isset($data)) {
+            return "";
+        }
+        return json_encode($data);
+    }
+
+    public static function unserializeData($data) {
+        if ($data === "") {
+            return;
+        }
+        return json_decode($data);
+    }
 }
