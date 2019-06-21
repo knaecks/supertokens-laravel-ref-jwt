@@ -57,4 +57,42 @@ class Utils {
     public static function generateSessionHandle() {
         return Utils::generateUUID();
     }
+
+    public static function sanitizeStringInput($field) {
+        if ($field === "") {
+            return "";
+        }
+
+        if (gettype($field) !== "string") {
+            return;
+        }
+
+        return trim($field);
+    }
+
+    public static function sanitizeNumberInput($field) {
+        $type = gettype($field);
+        if ($type === "integer" || $type === "double") {
+            return $field;
+        }
+
+        if ($type !== "string") {
+            return;
+        }
+
+        return number_format(trim($field));
+    }
+
+    public static function sanitizeBooleanInput($field) {
+        if ($field === true || $field === false) {
+            return $field;
+        }
+        if ($field === "false") {
+            return false;
+        }
+        if ($field === "true") {
+            return true;
+        }
+        return;
+    }
 }

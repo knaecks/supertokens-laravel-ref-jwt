@@ -3,6 +3,7 @@
 namespace SuperTokens\Laravel\Helpers;
 
 use SuperTokens\Laravel\Models\RefreshTokenModel;
+use SuperTokens\Laravel\Helpers\Utils;
 
 class RefreshToken {
 
@@ -22,10 +23,11 @@ class RefreshToken {
         $nonce = $splittedToken[1];
 
         // decrpyt and json parse to get following variable
-        $sessionHandle = '';
-        $userId = '';
-        $parentRefreshTokenHash1 = '';
-        $nonceFromEnc = '';
+        $payload = json_decode(Utils::decrypt($splittedToken[0], $key));
+        $sessionHandle = Utils::sanitizeStringInput($payload['sessionHandle']);
+        $userId = Utils::sanitizeStringInput($payload['userId']);
+        $parentRefreshTokenHash1 = Utils::sanitizeStringInput($payload['prt']);
+        $nonceFromEnc = Utils::sanitizeStringInput($payload['nonce']);
 
         if (!isset($sessionHandle) || !isset($userId) || $nonceFromEnc !== $nonce) {
             // throw error
@@ -41,12 +43,17 @@ class RefreshToken {
     /**
      * @todo
      */
-    public static function createNewRefreshToken($sessionHandle, $userId, $parentRefreshTokenHash1) {
+    public static function createNewRefreshToken(string $sessionHandle, string $userId, $parentRefreshTokenHash1) {
 
         $key = RefreshToken::getKey();
-        $nonce = ''; // hash of randomly generated UUID
-        $payloadSerialised = ''; // stringified json payload. will contain sessionHandle, userId, prt, nonce
-        $encryptedPart = ''; //encrypt $payloadSerialised with $key
+        $nonce = Utils::hashString(Utils::generateUUID()); // hash of randomly generated UUID
+        $payloadSerialised = json_encode([
+            'sessionHandle' => $sessionHandle,
+            'userId' => $sessionHandle,
+            'prt' => $parentRefreshTokenHash1,
+            'nonce' => $nonce
+        ]);
+        $encryptedPart = Utils::encrypt($payloadSerialised, $key); //encrypt $payloadSerialised with $key
         $token = $encryptedPart.'.'.$nonce;
         $validity = config('superTokens.tokens.refreshToken.validity');
         $date = new DateTime();

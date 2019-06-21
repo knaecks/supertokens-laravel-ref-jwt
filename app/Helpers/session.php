@@ -63,7 +63,8 @@ class Session {
                     'expires' => $accessTokenExipres,
                 ],
             ];
-        } catch(Exception $e) { DB::rollBack();
+        } catch(Exception $e) {
+            DB::rollBack();
             throw $e;
         }
         DB::commit();
