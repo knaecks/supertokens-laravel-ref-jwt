@@ -2,9 +2,11 @@
 
 namespace SuperTokens\Laravel\Helpers;
 
+use Ramsey\Uuid\Uuid;
+
 class Utils {
 
-    public static function encrypt (string $plaintext, string $masterkey) {
+    public static function encrypt(string $plaintext, string $masterkey) {
         $iv = random_bytes(16);
         $salt = random_bytes(64);
 
@@ -18,7 +20,7 @@ class Utils {
         return $ciphertext;
     }
 
-    public static function decrypt (string $encdata, string $masterkey) {
+    public static function decrypt(string $encdata, string $masterkey) {
         $bData = base64_decode($encdata);
 
         $salt = substr($bData, 0, 64); 
@@ -33,5 +35,26 @@ class Utils {
 
         $decrypted = utf8_encode($decipher);
         return $decrypted;
+    }
+
+    public static function hashString(string $toHash) {
+        return hash("sha256", $toHash);
+    }
+
+    public static function generateUUID() {
+        return Uuid::uuid1();
+    }
+
+    public static function generateNewSigningKey() {
+        $key = openssl_pbkdf2(random_bytes(64), random_bytes(64), 100, 32, "sha512");
+        return base64_encode($key);
+    }
+
+    public static function hmac(string $text, string $key) {
+        return hash_hmac("sha256", $text, $key);
+    }
+
+    public static function generateSessionHandle() {
+        return Utils::generateUUID();
     }
 }

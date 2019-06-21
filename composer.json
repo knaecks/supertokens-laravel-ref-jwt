@@ -5,7 +5,8 @@
     "license": "ISC",
     "minimum-stability": "dev",
     "require": {
-        "illuminate/database": "^5.9@dev"
+        "illuminate/database": "^5.9@dev",
+        "ramsey/uuid": "^4.0@dev"
     },
     "autoload": {
         "psr-4": {
