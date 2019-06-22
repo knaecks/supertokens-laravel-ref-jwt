@@ -233,35 +233,42 @@ class Session {
      * @todo
      */
     public static function revokeAllSessionsForUser(string $userId) {
-
+        $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
+        for ($i = 0; $i < count($sessionHandles); $i++) {
+            Session::revokeSessionUsingSessionHandle($sessionHandles[i]);
+        }
     }
 
     /**
      * @todo
      */
     public static function getAllSessionHandlesForUser(string $userId) {
-        return [];
+        $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
+        return $sessionHandles;
     }
 
     /**
      * @todo
      */
     public static function revokeSessionUsingSessionHandle(string $sessionHandle) {
-        return true;
+        RefreshTokenDb::deleteSession($sessionHandle);
     }
 
     /**
      * @todo
      */
     public static function getSessionData(string $sessionHandle) {
-
+        $result = RefreshTokenDb::getSessionData($sessionHandle);
+        if (!$result['found']) {
+            // throw error: session does not exist anymore
+        }
+        return $result['data'];
     }
 
     /**
      * @todo
      */
-    public static function updateSessionData(string $sessionHandle, $newSessionData)
-    {
-
+    public static function updateSessionData(string $sessionHandle, $newSessionData) {
+        RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
     }
 }

@@ -8,8 +8,7 @@ use SuperTokens\Laravel\Models\RefreshTokenModel;
 class RefreshTokenDb {
 
     public static function isSessionBlacklisted($sessionHandle): boolean {
-        $result = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->get();
-        $noOfRows = $result->count();
+        $noOfRows = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->count();
         return $noOfRows === 0;
     }
 
@@ -43,6 +42,37 @@ class RefreshTokenDb {
         $session->refresh_token_hash_2 = $refreshTokenHash2;
         $session->session_info = Utils::serializeData($sessionData);
         $session->expires_at = $expiresAt;
+        $session->save();
+    }
+
+    public static function getAllSessionHandlesForUser(string $userId) {
+        $sessions = RefreshTokenModel::where('user_id', '=', $userId)->get();
+        $sessionHandles = [];
+        foreach ($sessions as $session) {
+            array_push($sessionHandles, strval($session->session_handle));
+        }
+    }
+
+    public static function deleteSession(string $sessionHandle) {
+        RefreshTokenModel::where('session_handle', '=', $sessionHandle)->delete();
+    }
+
+    public static function getSessionData(string $sessionHandle) {
+        $session = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->first();
+        if ($session === null) {
+            return [
+                'found' => false
+            ];
+        }
+        return [
+            'found' => true,
+            'data' => Utils::unserializeData($session->session_info)
+        ];
+    }
+
+    public static function updateSessionData(string $sessionHandle, $sessionData) {
+        $session = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->first();
+        $session->session_info = Utils::serializeData($sessionData);
         $session->save();
     }
 }

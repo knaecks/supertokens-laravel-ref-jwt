@@ -25,18 +25,18 @@ class Jwt {
         $header = Jwt::getHeader();
 
         if (count($splittedInput) !== 3) {
-            // error
+            // throw error: invalid jwt
         }
 
         if ($splittedInput[0] !== $header) {
-            // error
+            // throw error: jwt header mismatch
         }
 
         $payload = $splittedInput[1];
         $signatureFromHeaderAndPayload = Utils::hmac($header.".".$payload, $signingKey);
 
         if ($signatureFromHeaderAndPayload !== $splittedInput[2]) {
-            // error
+            // throw error: jwt verification failed
         }
 
         $payload = base64_decode($payload);
