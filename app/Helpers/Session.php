@@ -55,7 +55,7 @@ class Session {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
         $sessionHandle = $accessTokenInfo['sessionHandle'];
 
-        $blacklisting = config('superTokens.tokens.accessToken.blacklisting');
+        $blacklisting = config('supertokens.tokens.accessToken.blacklisting');
 
         if (isset($blacklisting) && $blacklisting) {
             $isBlacklisted = RefreshTokenDb::isSessionBlacklisted($sessionHandle);
@@ -88,7 +88,7 @@ class Session {
             if ($promote || $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['refreshTokenHash1'])) {
 
                 if ($promote) {
-                    $validity = config('superTokens.tokens.refreshToken.validity');
+                    $validity = config('supertokens.tokens.refreshToken.validity');
                     $date = new DateTime();
                     $currentTimestamp = $date->getTimestamp();
                     $expiresAt = $currentTimestamp + $validity;
@@ -202,7 +202,7 @@ class Session {
                 // result in refresh tokens living on for a longer period of time than what is expected. But that is OK, since they keep changing
                 // based on access token's expiry anyways.
                 // This can be solved fairly easily by keeping the expiry time in the refresh token payload as well.
-                $validity = config('superTokens.tokens.refreshToken.validity');
+                $validity = config('supertokens.tokens.refreshToken.validity');
                 $date = new DateTime();
                 $currentTimestamp = $date->getTimestamp();
                 $expiresAt = $currentTimestamp + $validity;

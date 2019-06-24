@@ -23,7 +23,7 @@ class Utils {
     public static function decrypt(string $encdata, string $masterkey) {
         $bData = base64_decode($encdata);
 
-        $salt = substr($bData, 0, 64); 
+        $salt = substr($bData, 0, 64);
         $iv = substr($bData, 64, 16);
         $tag = substr($bData, 80, 16);
         $text = substr($bData, 96);

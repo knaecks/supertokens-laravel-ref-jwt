@@ -49,7 +49,7 @@ class AccessToken {
             'expiryTime' => $expiryTime,
             'parentRefreshTokenHash1' => $parentRefreshTokenHash1,
             'userPayload' => $userPayload,
-        ];   
+        ];
     }
 
     /**
@@ -58,7 +58,7 @@ class AccessToken {
     public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload) {
 
         $key = AccessToken::getKey();
-        $validity = config('superTokens.tokens.accessToken.validity');
+        $validity = config('supertokens.tokens.accessToken.validity');
         $date = new DateTime();
         $currentTimestamp = $date->getTimestamp();
         $expiry = $currentTimestamp + $validity;

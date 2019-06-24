@@ -5,7 +5,7 @@ namespace SuperTokens\Laravel\Helpers;
 use SuperTokens\Laravel\Helpers\Utils;
 
 class Jwt {
-    
+
     protected static function getHeader() {
         return base64_encode(json_encode([
             'alg' => 'HS256',

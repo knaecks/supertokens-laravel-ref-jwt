@@ -55,7 +55,7 @@ class RefreshToken {
         ]);
         $encryptedPart = Utils::encrypt($payloadSerialised, $key); //encrypt $payloadSerialised with $key
         $token = $encryptedPart.'.'.$nonce;
-        $validity = config('superTokens.tokens.refreshToken.validity');
+        $validity = config('supertokens.tokens.refreshToken.validity');
         $date = new DateTime();
         $currentTimestamp = $date->getTimestamp();
         $expiry = $currentTimestamp + $validity;
