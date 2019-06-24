@@ -6,6 +6,9 @@ use SuperTokens\Laravel\Helpers\Utils;
 
 class Jwt {
 
+    /**
+     * @return string
+     */
     protected static function getHeader() {
         return base64_encode(json_encode([
             'alg' => 'HS256',
@@ -13,14 +16,24 @@ class Jwt {
         ]));
     }
 
-    public static function createJWT($plainTextPayload, string $signingKey) {
+    /**
+     * @param $plainTextPayload
+     * @param $signingKey
+     * @return string
+     */
+    public static function createJWT($plainTextPayload, $signingKey) {
         $header = Jwt::getHeader();
         $payload = base64_encode(json_encode($plainTextPayload));
         $signature = Utils::hmac($header.".".$payload, $signingKey);
         return "$header.$payload.$signature";
     }
 
-    public static function verifyJWTAndGetPayload(string $jwt, string $signingKey) {
+    /**
+     * @param $jwt
+     * @param $signingKey
+     * @return mixed
+     */
+    public static function verifyJWTAndGetPayload($jwt, $signingKey) {
         $splittedInput = explode(".", $jwt);
         $header = Jwt::getHeader();
 

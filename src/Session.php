@@ -1,19 +1,42 @@
 <?php
 
-namespace SuperTokens\Laravel\Helpers;
+namespace SuperTokens\Laravel;
 
+use DateTime;
+use Error;
+use Exception;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Laravel\Helpers\Utils;
 use SuperTokens\Laravel\Helpers\AccessToken;
 use SuperTokens\Laravel\Helpers\RefreshToken;
-use SuperTokens\Laravel\Models\RefreshTokenModel;
 use SuperTokens\Laravel\Db\RefreshTokenDb;
+use SuperTokens\Laravel\Helpers\AccessTokenSigningKey;
+use SuperTokens\Laravel\Helpers\RefreshTokenSigningKey;
 
+/**
+ * Class Session
+ * @package SuperTokens\Laravel
+ */
 class Session {
+
     /**
-     * @todo
+     * Session constructor.
+     * @throws Exception
      */
-    public static function createNewSession(string $userId, $jwtPayload, $sessionData) {
+    public function __construct() {
+        AccessTokenSigningKey::init();
+        RefreshTokenSigningKey::init();
+    }
+
+    /**
+     * @param $userId
+     * @param $jwtPayload
+     * @param $sessionData
+     * @return array
+     * @throws Exception
+     */
+    public function createNewSession($userId, $jwtPayload, $sessionData) {
         $sessionHandle = Utils::generateSessionHandle();
         $refreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $userId, null);
         $accessToken = AccessToken::createNewAccessToken($sessionHandle, $userId, Utils::hashString($refreshToken['token']), null, $jwtPayload);
@@ -30,7 +53,7 @@ class Session {
        return [
             'session' => [
                 'handle' => $sessionHandle,
-                'userid' => $userId,
+                'userId' => $userId,
                 'jwtPayload' => $jwtPayload,
             ],
             'accessToken' => [
@@ -49,17 +72,20 @@ class Session {
     }
 
     /**
-     * @todo
+     * @param $accessToken
+     * @return array
+     * @throws Exception
      */
-    public static function getSession(string $accessToken) {
+    public function getSession($accessToken) {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
         $sessionHandle = $accessTokenInfo['sessionHandle'];
 
-        $blacklisting = config('supertokens.tokens.accessToken.blacklisting');
+        $blacklisting = Config::get('supertokens.tokens.accessToken.blacklisting');
 
         if (isset($blacklisting) && $blacklisting) {
             $isBlacklisted = RefreshTokenDb::isSessionBlacklisted($sessionHandle);
             if ($isBlacklisted) {
+                throw new Error();
                 // throw error: session is over or has been blacklisted
             }
         }
@@ -68,7 +94,7 @@ class Session {
             return [
                 'session' => [
                     'handle' => $accessTokenInfo['sessionHandle'],
-                    'userid' => $accessTokenInfo['userId'],
+                    'userId' => $accessTokenInfo['userId'],
                     'jwtPayload' => $accessTokenInfo['userPayload'],
                 ],
                 'newAccessToken' => null
@@ -88,13 +114,13 @@ class Session {
             if ($promote || $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['refreshTokenHash1'])) {
 
                 if ($promote) {
-                    $validity = config('supertokens.tokens.refreshToken.validity');
+                    $validity = Config::get('supertokens.tokens.refreshToken.validity');
                     $date = new DateTime();
                     $currentTimestamp = $date->getTimestamp();
                     $expiresAt = $currentTimestamp + $validity;
                     RefreshTokenDb::updateSessionInfo(
                         $sessionHandle,
-                        Utils::hashString(accessTokenInfo['refreshTokenHash1']),
+                        Utils::hashString($accessTokenInfo['refreshTokenHash1']),
                         $sessionInfo['sessionData'],
                         $expiresAt
                     );
@@ -110,7 +136,7 @@ class Session {
                 return [
                     'session' => [
                         'handle' => $sessionHandle,
-                        'userid' => $accessTokenInfo['userId'],
+                        'userId' => $accessTokenInfo['userId'],
                         'jwtPayload' => $accessTokenInfo['userPayload'],
                     ],
                     'newAccessToken' => [
@@ -121,6 +147,7 @@ class Session {
             }
 
             DB::commit();
+            throw new Error("some error");
             // throw error: using access token whose refresh token is no more.
         } catch(Exception $e) {
             DB::rollBack();
@@ -129,17 +156,22 @@ class Session {
     }
 
     /**
-     * @todo
+     * @param $refreshToken
+     * @return array
+     * @throws Exception
      */
-    public static function refreshSession(string $refreshToken) {
+    public static function refreshSession($refreshToken) {
         $refreshTokenInfo = RefreshToken::getInfoFromRefreshToken($refreshToken);
         return Session::refreshSessionHelper($refreshToken, $refreshTokenInfo);
     }
 
     /**
-     * @todo
+     * @param $refreshToken
+     * @param $refreshTokenInfo
+     * @return array
+     * @throws Exception
      */
-    public static function refreshSessionHelper(string $refreshToken, $refreshTokenInfo) {
+    public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
         DB::beginTransaction();
         try {
@@ -160,7 +192,7 @@ class Session {
             if ($sessionInfo['refreshTokenHash2'] === Utils::hashString(Utils::hashString($refreshToken))) {
                 DB::commit();
                 $newRefreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $refreshTokenInfo['userId'], Utils::hashString($refreshToken));
-                $accessToken = AccessToken::createNewAccessToken(
+                $newAccessToken = AccessToken::createNewAccessToken(
                     $sessionHandle,
                     $refreshTokenInfo['userId'],
                     Utils::hashString($newRefreshToken['token']),
@@ -170,7 +202,7 @@ class Session {
                 return [
                     'session' => [
                         'handle' => $sessionHandle,
-                        'userid' => $refreshTokenInfo['userId'],
+                        'userId' => $refreshTokenInfo['userId'],
                         'jwtPayload' => $sessionInfo['jwtPayload'],
                     ],
                     'newAccessToken' => [
@@ -202,7 +234,7 @@ class Session {
                 // result in refresh tokens living on for a longer period of time than what is expected. But that is OK, since they keep changing
                 // based on access token's expiry anyways.
                 // This can be solved fairly easily by keeping the expiry time in the refresh token payload as well.
-                $validity = config('supertokens.tokens.refreshToken.validity');
+                $validity = Config::get('supertokens.tokens.refreshToken.validity');
                 $date = new DateTime();
                 $currentTimestamp = $date->getTimestamp();
                 $expiresAt = $currentTimestamp + $validity;
@@ -213,15 +245,12 @@ class Session {
                     $expiresAt
                 );
                 DB::commit();
-
                 // now we can generate children tokens for the current input token.
                 return Session::refreshSessionHelper($refreshToken, $refreshTokenInfo);
             }
 
             DB::commit();
-            /**
-             * @todo: token theft
-             */
+            throw new Error("token theft");
             // throw error: token theft detected!
         } catch (Exception $e) {
             DB::rollBack();
@@ -230,45 +259,49 @@ class Session {
     }
 
     /**
-     * @todo
+     * @param $userId
      */
-    public static function revokeAllSessionsForUser(string $userId) {
+    public static function revokeAllSessionsForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
         for ($i = 0; $i < count($sessionHandles); $i++) {
-            Session::revokeSessionUsingSessionHandle($sessionHandles[i]);
+            Session::revokeSessionUsingSessionHandle($sessionHandles[$i]);
         }
     }
 
     /**
-     * @todo
+     * @param $userId
+     * @return array
      */
-    public static function getAllSessionHandlesForUser(string $userId) {
+    public static function getAllSessionHandlesForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
         return $sessionHandles;
     }
 
     /**
-     * @todo
+     * @param $sessionHandle
      */
-    public static function revokeSessionUsingSessionHandle(string $sessionHandle) {
+    public static function revokeSessionUsingSessionHandle($sessionHandle) {
         RefreshTokenDb::deleteSession($sessionHandle);
     }
 
     /**
-     * @todo
+     * @param $sessionHandle
+     * @return mixed
      */
-    public static function getSessionData(string $sessionHandle) {
+    public static function getSessionData($sessionHandle) {
         $result = RefreshTokenDb::getSessionData($sessionHandle);
         if (!$result['found']) {
+            throw new Error();
             // throw error: session does not exist anymore
         }
         return $result['data'];
     }
 
     /**
-     * @todo
+     * @param $sessionHandle
+     * @param $newSessionData
      */
-    public static function updateSessionData(string $sessionHandle, $newSessionData) {
+    public static function updateSessionData($sessionHandle, $newSessionData) {
         RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
     }
 }

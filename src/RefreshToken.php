@@ -2,22 +2,25 @@
 
 namespace SuperTokens\Laravel\Helpers;
 
-use SuperTokens\Laravel\Models\RefreshTokenModel;
-use SuperTokens\Laravel\Helpers\Utils;
+use Error;
+use Exception;
+use DateTime;
+use Illuminate\Support\Facades\Config;
 
 class RefreshToken {
 
-    private static $key;
-
     /**
-     * @todo
+     * @param $token
+     * @return array
+     * @throws Exception
      */
-    public static function getInfoFromRefreshToken(string $token) {
+    public static function getInfoFromRefreshToken($token) {
 
-        $key = RefreshToken::getKey();
+        $key = RefreshTokenSigningKey::getKey();
         $splittedToken = explode(".", $token);
 
         if (count($splittedToken) > 2) {
+            throw new Error();
             // throw error
         }
         $nonce = $splittedToken[1];
@@ -30,6 +33,7 @@ class RefreshToken {
         $nonceFromEnc = Utils::sanitizeStringInput($payload['nonce']);
 
         if (!isset($sessionHandle) || !isset($userId) || $nonceFromEnc !== $nonce) {
+            throw new Error();
             // throw error
         }
 
@@ -41,31 +45,32 @@ class RefreshToken {
     }
 
     /**
-     * @todo
+     * @param $sessionHandle
+     * @param $userId
+     * @param $parentRefreshTokenHash1
+     * @return array
+     * @throws Exception
      */
-    public static function createNewRefreshToken(string $sessionHandle, string $userId, $parentRefreshTokenHash1) {
+    public static function createNewRefreshToken($sessionHandle, $userId, $parentRefreshTokenHash1) {
 
-        $key = RefreshToken::getKey();
+        $key = RefreshTokenSigningKey::getKey();
         $nonce = Utils::hashString(Utils::generateUUID()); // hash of randomly generated UUID
         $payloadSerialised = json_encode([
             'sessionHandle' => $sessionHandle,
-            'userId' => $sessionHandle,
+            'userId' => $userId,
             'prt' => $parentRefreshTokenHash1,
             'nonce' => $nonce
         ]);
         $encryptedPart = Utils::encrypt($payloadSerialised, $key); //encrypt $payloadSerialised with $key
         $token = $encryptedPart.'.'.$nonce;
-        $validity = config('supertokens.tokens.refreshToken.validity');
+        $validity = Config::get('supertokens.tokens.refreshToken.validity');
         $date = new DateTime();
         $currentTimestamp = $date->getTimestamp();
         $expiry = $currentTimestamp + $validity;
-        return [
+        return array(
             'token' => $token,
             'expiry' => $expiry
-        ];
+        );
     }
 
-    public static function getKey() {
-        return "some key";
-    }
 }

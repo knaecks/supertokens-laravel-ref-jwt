@@ -2,24 +2,27 @@
 
 namespace SuperTokens\Laravel\Helpers;
 
-use SuperTokens\Laravel\Helpers\Jwt;
-use SuperTokens\Laravel\Helpers\Utils;
+use DateTime;
+use Error;
+use Exception;
+use Illuminate\Support\Facades\Config;
 
 class AccessToken {
 
     /**
-     * @todo
+     * @param $token
+     * @param bool $retry
+     * @return array
+     * @throws Exception
      */
-    public static function getInfoFromAccessToken(string $token, $retry = true) {
+    public static function getInfoFromAccessToken($token, $retry = true) {
 
-        $key = AccessToken::getKey();
+        $key = AccessTokenSigningKey::getKey();
         try {
             $payload = Jwt::verifyJWTAndGetPayload($token, $key);
         } catch (Exception $e) {
             if ($retry) {
-                /**
-                 * @todo: unset signing key
-                 */
+                AccessTokenSigningKey::removeKeyFromMemory();
                 return AccessToken::getInfoFromAccessToken($token, false);
             } else {
                 throw $e;
@@ -35,10 +38,12 @@ class AccessToken {
         if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime)) {
             // it would come here if we change the structure of the JWT.
             // throw error
+            throw new Error("");
         }
         $date = new DateTime();
         $currentTimestamp = $date->getTimestamp();
         if ($expiryTime < $currentTimestamp) {
+            throw new Error("");
             // throw Error("expired access token");
         }
 
@@ -53,12 +58,18 @@ class AccessToken {
     }
 
     /**
-     * @todo
+     * @param $sessionHandle
+     * @param $userId
+     * @param $refreshTokenHash1
+     * @param $parentRefreshTokenHash1
+     * @param $userPayload
+     * @return array
+     * @throws Exception
      */
     public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload) {
 
-        $key = AccessToken::getKey();
-        $validity = config('supertokens.tokens.accessToken.validity');
+        $key = AccessTokenSigningKey::getKey();
+        $validity = Config::get('supertokens.tokens.accessToken.validity');
         $date = new DateTime();
         $currentTimestamp = $date->getTimestamp();
         $expiry = $currentTimestamp + $validity;
@@ -76,9 +87,5 @@ class AccessToken {
             'token' => $token,
             'expiry' => $expiry
         ];
-    }
-
-    public static function getKey() {
-        return "some key";
     }
 }

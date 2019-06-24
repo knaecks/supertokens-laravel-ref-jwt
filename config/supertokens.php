@@ -6,7 +6,7 @@ return [
             'signingKey' => [
                 'dynamic' => env('AA', true),
                 'updateInterval' => env('BB', 24),
-                'get' => env('CC'),
+                'get' => env('CC', null),
             ],
             'validity' => env('DD', 3600),
             'blacklisting' => env('EE', false),

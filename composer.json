@@ -6,11 +6,21 @@
     "minimum-stability": "dev",
     "require": {
         "illuminate/database": "^5.9@dev",
-        "ramsey/uuid": "^4.0@dev"
+        "ramsey/uuid": "^4.0@dev",
+        "ext-json": "^1.6",
+        "ext-openssl": "^7.2",
+        "illuminate/http": "^5.9@dev"
     },
     "autoload": {
         "psr-4": {
-            "SuperTokens\\Laravel\\": "app"
+            "SuperTokens\\Laravel\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SuperTokens\\Session\\Providers\\SuperTokensServiceProvider"
+            ]
         }
     }
 }

@@ -2,11 +2,19 @@
 
 namespace SuperTokens\Laravel\Helpers;
 
+use DateTime;
+use Exception;
 use Ramsey\Uuid\Uuid;
 
 class Utils {
 
-    public static function encrypt(string $plaintext, string $masterkey) {
+    /**
+     * @param $plaintext
+     * @param $masterkey
+     * @return string
+     * @throws Exception
+     */
+    public static function encrypt($plaintext, $masterkey) {
         $iv = random_bytes(16);
         $salt = random_bytes(64);
 
@@ -20,7 +28,12 @@ class Utils {
         return $ciphertext;
     }
 
-    public static function decrypt(string $encdata, string $masterkey) {
+    /**
+     * @param $encdata
+     * @param $masterkey
+     * @return string
+     */
+    public static function decrypt($encdata, $masterkey) {
         $bData = base64_decode($encdata);
 
         $salt = substr($bData, 0, 64);
@@ -37,27 +50,52 @@ class Utils {
         return $decrypted;
     }
 
-    public static function hashString(string $toHash) {
+    /**
+     * @param $toHash
+     * @return string
+     */
+    public static function hashString($toHash) {
         return hash("sha256", $toHash);
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public static function generateUUID() {
-        return Uuid::uuid1();
+        return Uuid::uuid1()->getBytes();
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public static function generateNewSigningKey() {
         $key = openssl_pbkdf2(random_bytes(64), random_bytes(64), 100, 32, "sha512");
         return base64_encode($key);
     }
 
-    public static function hmac(string $text, string $key) {
+    /**
+     * @param $text
+     * @param $key
+     * @return string
+     */
+    public static function hmac($text, $key) {
         return hash_hmac("sha256", $text, $key);
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public static function generateSessionHandle() {
         return Utils::generateUUID();
     }
 
+    /**
+     * @param $field
+     * @return string|void
+     */
     public static function sanitizeStringInput($field) {
         if ($field === "") {
             return "";
@@ -70,6 +108,10 @@ class Utils {
         return trim($field);
     }
 
+    /**
+     * @param $field
+     * @return string|void
+     */
     public static function sanitizeNumberInput($field) {
         $type = gettype($field);
         if ($type === "integer" || $type === "double") {
@@ -83,6 +125,10 @@ class Utils {
         return number_format(trim($field));
     }
 
+    /**
+     * @param $field
+     * @return bool|void
+     */
     public static function sanitizeBooleanInput($field) {
         if ($field === true || $field === false) {
             return $field;
@@ -96,6 +142,10 @@ class Utils {
         return;
     }
 
+    /**
+     * @param $data
+     * @return false|string
+     */
     public static function serializeData($data) {
         if (!isset($data)) {
             return "";
@@ -103,10 +153,22 @@ class Utils {
         return json_encode($data);
     }
 
+    /**
+     * @param $data
+     * @return mixed|void
+     */
     public static function unserializeData($data) {
         if ($data === "") {
             return;
         }
         return json_decode($data);
+    }
+
+    /**
+     * @return int
+     * @throws Exception
+     */
+    public  static function getDateTimeStamp() {
+        return (new DateTime())->getTimestamp();
     }
 }
