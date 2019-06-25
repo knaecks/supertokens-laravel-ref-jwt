@@ -11,6 +11,7 @@ class SigningKeyDb {
      * @return array|null
      */
     public static function getKeyValueFromKeyName($keyName) {
+        // check for transaction
         $result= SigningKeyModel::where('key_name', '=', $keyName)->lockForUpdate()->first();
         if ($result === null) {
             return null;

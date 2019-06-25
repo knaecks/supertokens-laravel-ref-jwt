@@ -70,6 +70,7 @@ class AccessTokenSigningKey {
      * @throws Exception
      */
     private function getKeyFromInstance() {
+        // wrap around error
         if (isset($this->userDefinedGet)) {
             return $this->userDefinedGet();
         }
