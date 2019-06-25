@@ -2,8 +2,6 @@
 
 namespace SuperTokens\Laravel\Helpers;
 
-use SuperTokens\Laravel\Helpers\Utils;
-
 class Jwt {
 
     /**

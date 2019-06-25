@@ -8,8 +8,6 @@ use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Laravel\Helpers\Utils;
-use SuperTokens\Laravel\Helpers\AccessToken;
-use SuperTokens\Laravel\Helpers\RefreshToken;
 use SuperTokens\Laravel\Db\RefreshTokenDb;
 use SuperTokens\Laravel\Helpers\AccessTokenSigningKey;
 use SuperTokens\Laravel\Helpers\RefreshTokenSigningKey;

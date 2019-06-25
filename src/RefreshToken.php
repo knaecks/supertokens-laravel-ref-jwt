@@ -1,11 +1,13 @@
 <?php
 
-namespace SuperTokens\Laravel\Helpers;
+namespace SuperTokens\Laravel;
 
 use Error;
 use Exception;
 use DateTime;
 use Illuminate\Support\Facades\Config;
+use SuperTokens\Laravel\Helpers\Utils;
+use SuperTokens\Laravel\Helpers\RefreshTokenSigningKey;
 
 class RefreshToken {
 

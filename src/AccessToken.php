@@ -1,11 +1,14 @@
 <?php
 
-namespace SuperTokens\Laravel\Helpers;
+namespace SuperTokens\Laravel;
 
 use DateTime;
 use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
+use SuperTokens\Laravel\Helpers\Utils;
+use SuperTokens\Laravel\Helpers\Jwt;
+use SuperTokens\Laravel\Helpers\AccessTokenSigningKey;
 
 class AccessToken {
 
