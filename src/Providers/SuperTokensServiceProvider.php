@@ -25,7 +25,7 @@ class SuperTokensServiceProvider extends ServiceProvider {
     }
 
     private function registerResources() {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         $this->registerFacades();
     }
 

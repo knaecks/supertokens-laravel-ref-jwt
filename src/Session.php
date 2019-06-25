@@ -160,7 +160,7 @@ class Session {
      * @return array
      * @throws Exception
      */
-    public static function refreshSession($refreshToken) {
+    public function refreshSession($refreshToken) {
         $refreshTokenInfo = RefreshToken::getInfoFromRefreshToken($refreshToken);
         return Session::refreshSessionHelper($refreshToken, $refreshTokenInfo);
     }
@@ -171,7 +171,7 @@ class Session {
      * @return array
      * @throws Exception
      */
-    public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
+    public function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
         DB::beginTransaction();
         try {
@@ -261,7 +261,7 @@ class Session {
     /**
      * @param $userId
      */
-    public static function revokeAllSessionsForUser($userId) {
+    public function revokeAllSessionsForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
         for ($i = 0; $i < count($sessionHandles); $i++) {
             Session::revokeSessionUsingSessionHandle($sessionHandles[$i]);
@@ -272,7 +272,7 @@ class Session {
      * @param $userId
      * @return array
      */
-    public static function getAllSessionHandlesForUser($userId) {
+    public function getAllSessionHandlesForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
         return $sessionHandles;
     }
@@ -280,7 +280,7 @@ class Session {
     /**
      * @param $sessionHandle
      */
-    public static function revokeSessionUsingSessionHandle($sessionHandle) {
+    public function revokeSessionUsingSessionHandle($sessionHandle) {
         RefreshTokenDb::deleteSession($sessionHandle);
     }
 
@@ -288,7 +288,7 @@ class Session {
      * @param $sessionHandle
      * @return mixed
      */
-    public static function getSessionData($sessionHandle) {
+    public function getSessionData($sessionHandle) {
         $result = RefreshTokenDb::getSessionData($sessionHandle);
         if (!$result['found']) {
             throw new Error();
@@ -301,7 +301,7 @@ class Session {
      * @param $sessionHandle
      * @param $newSessionData
      */
-    public static function updateSessionData($sessionHandle, $newSessionData) {
+    public function updateSessionData($sessionHandle, $newSessionData) {
         RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
     }
 }
