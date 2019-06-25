@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f559a9ea-f728-4bb5-aae3-8997f47308ea" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AccessToken.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AccessToken.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Helpers/Jwt.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Helpers/Jwt.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RefreshToken.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/RefreshToken.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Session.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Session.php" afterDir="false" />
-    </list>
+    <list default="true" id="f559a9ea-f728-4bb5-aae3-8997f47308ea" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,18 +30,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="135">
               <caret line="9" column="38" selection-start-line="9" selection-start-column="38" selection-end-line="9" selection-end-column="38" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Providers/SuperTokensServiceProvider.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="217">
-              <caret line="18" column="6" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="6" />
-              <folding>
-                <element signature="e#49#88#0#PHP" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -201,7 +182,7 @@
       <path value="$PROJECT_DIR$/vendor/illuminate/http" />
     </include_path>
   </component>
-  <component name="ProjectFrameBounds" fullScreen="true">
+  <component name="ProjectFrameBounds" extendedState="1" fullScreen="true">
     <option name="x" value="10" />
     <option name="y" value="40" />
     <option name="width" value="1346" />
@@ -220,6 +201,11 @@
             <path>
               <item name="supertokens-laravel-ref-jwt" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
               <item name="~/clones/supertokens-laravel-ref-jwt" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+            <path>
+              <item name="supertokens-laravel-ref-jwt" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/clones/supertokens-laravel-ref-jwt" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name=".idea" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
             <path>
               <item name="supertokens-laravel-ref-jwt" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
@@ -302,15 +288,15 @@
       <updated>1561381990810</updated>
       <workItem from="1561381997075" duration="19560000" />
       <workItem from="1561452056225" duration="5777000" />
-      <workItem from="1561460578001" duration="560000" />
+      <workItem from="1561460578001" duration="893000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25897000" />
+    <option name="totallyTimeSpent" value="26230000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="-29" width="1366" height="797" extended-state="0" />
+    <frame x="0" y="-29" width="1366" height="797" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
@@ -579,6 +565,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="38" selection-start-line="8" selection-start-column="38" selection-end-line="8" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="4" selection-end-line="592" selection-end-column="10" />
         </state>
       </provider>
     </entry>
