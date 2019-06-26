@@ -50,8 +50,9 @@ class AccessTokenSigningKey {
 
     /**
      * AccessTokenSigningKey constructor.
+     * @param Closure|null $getSigningKey
      */
-    private function __construct(Closure $getSigningKey = null) {
+    private function __construct($getSigningKey = null) {
         $this->isDynamic = Config::get('supertokens.tokens.accessToken.signingKey.dynamic');
         $this->updateInterval = Config::get('supertokens.tokens.accessToken.signingKey.updateInterval');
         if ($getSigningKey !== null && is_callable($getSigningKey)) {
@@ -62,9 +63,10 @@ class AccessTokenSigningKey {
     }
 
     /**
+     * @param Closure|null $getSigningKey
      * @throws SuperTokensAuthException
      */
-    public static function init(Closure $getSigningKey = null) {
+    public static function init($getSigningKey = null) {
         if (!isset(AccessTokenSigningKey::$instance)) {
             AccessTokenSigningKey::$instance = new AccessTokenSigningKey($getSigningKey);
             AccessTokenSigningKey::getKey();

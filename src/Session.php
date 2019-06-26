@@ -27,9 +27,10 @@ class Session {
 
     /**
      * Session constructor.
-     * @throws Exception
+     * @param Closure|null $getSigningKey
+     * @throws SuperTokensAuthException
      */
-    public function __construct(Closure $getSigningKey = null) {
+    public function __construct($getSigningKey = null) {
         if (!Session::$isInitiated) {
             AccessTokenSigningKey::init($getSigningKey);
             RefreshTokenSigningKey::init();
