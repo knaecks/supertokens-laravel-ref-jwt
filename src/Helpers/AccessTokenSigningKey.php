@@ -2,7 +2,6 @@
 
 namespace SuperTokens\Session\Helpers;
 
-use Closure;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +28,7 @@ class AccessTokenSigningKey {
     private $signingKey;
 
     /**
-     * @var Closure
+     * @var mixed
      */
     private $userDefinedGet;
 
@@ -50,25 +49,19 @@ class AccessTokenSigningKey {
 
     /**
      * AccessTokenSigningKey constructor.
-     * @param Closure|null $getSigningKey
      */
-    private function __construct($getSigningKey = null) {
+    private function __construct() {
         $this->isDynamic = Config::get('supertokens.tokens.accessToken.signingKey.dynamic');
         $this->updateInterval = Config::get('supertokens.tokens.accessToken.signingKey.updateInterval');
-        if ($getSigningKey !== null && is_callable($getSigningKey)) {
-            $this->userDefinedGet = $getSigningKey;
-        } else {
-            $this->userDefinedGet = Config::get('supertokens.tokens.accessToken.signingKey.get');
-        }
+        $this->userDefinedGet = Config::get('supertokens.tokens.accessToken.signingKey.get');
     }
 
     /**
-     * @param Closure|null $getSigningKey
      * @throws SuperTokensAuthException
      */
-    public static function init($getSigningKey = null) {
+    public static function init() {
         if (!isset(AccessTokenSigningKey::$instance)) {
-            AccessTokenSigningKey::$instance = new AccessTokenSigningKey($getSigningKey);
+            AccessTokenSigningKey::$instance = new AccessTokenSigningKey();
             AccessTokenSigningKey::getKey();
         }
     }

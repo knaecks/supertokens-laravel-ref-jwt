@@ -3,7 +3,7 @@
 namespace SuperTokens\Session;
 
 use DateTime;
-use Closure;
+use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -21,21 +21,12 @@ use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 class Session {
 
     /**
-     * @var bool
-     */
-    private static $isInitiated = false;
-
-    /**
      * Session constructor.
-     * @param Closure|null $getSigningKey
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
-    public function __construct($getSigningKey = null) {
-        if (!Session::$isInitiated) {
-            AccessTokenSigningKey::init($getSigningKey);
-            RefreshTokenSigningKey::init();
-            Session::$isInitiated = true;
-        }
+    public function __construct() {
+        AccessTokenSigningKey::init();
+        RefreshTokenSigningKey::init();
     }
 
     /**

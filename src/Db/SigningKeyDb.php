@@ -3,7 +3,6 @@
 namespace SuperTokens\Session\Db;
 
 use Exception;
-use Illuminate\Support\Facades\DB;
 use SuperTokens\Session\Exceptions\GeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensAuthException;
 use SuperTokens\Session\Models\SigningKeyModel;
@@ -18,7 +17,6 @@ class SigningKeyDb {
     public static function getKeyValueFromKeyName($keyName) {
         // check for transaction
         try {
-            DB::transactionLevel();
             $result= SigningKeyModel::where('key_name', '=', $keyName)->lockForUpdate()->first();
             if ($result === null) {
                 return null;
