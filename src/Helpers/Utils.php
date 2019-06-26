@@ -168,7 +168,7 @@ class Utils {
      * @return int
      * @throws Exception
      */
-    public  static function getDateTimeStamp() {
+    public static function getDateTimeStamp() {
         return (new DateTime())->getTimestamp();
     }
 }

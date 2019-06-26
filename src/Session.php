@@ -7,6 +7,8 @@ use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
+use SuperTokens\Laravel\Exceptions\UnauthorizedException;
 use SuperTokens\Laravel\Helpers\Utils;
 use SuperTokens\Laravel\Db\RefreshTokenDb;
 use SuperTokens\Laravel\Helpers\AccessTokenSigningKey;
@@ -32,7 +34,7 @@ class Session {
      * @param $jwtPayload
      * @param $sessionData
      * @return array
-     * @throws Exception
+     * @throws SuperTokensAuthException | Exception
      */
     public function createNewSession($userId, $jwtPayload, $sessionData) {
         $sessionHandle = Utils::generateSessionHandle();
@@ -72,7 +74,7 @@ class Session {
     /**
      * @param $accessToken
      * @return array
-     * @throws Exception
+     * @throws SuperTokensAuthException | Exception
      */
     public function getSession($accessToken) {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
@@ -83,8 +85,7 @@ class Session {
         if (isset($blacklisting) && $blacklisting) {
             $isBlacklisted = RefreshTokenDb::isSessionBlacklisted($sessionHandle);
             if ($isBlacklisted) {
-                throw new Error();
-                // throw error: session is over or has been blacklisted
+                throw new UnauthorizedException("session is over or has been blacklisted");
             }
         }
 
@@ -105,7 +106,7 @@ class Session {
             $sessionInfo = RefreshTokenDb::getSessionInfo($sessionHandle);
             if (!isset($sessionInfo)) {
                 DB::commit();
-                // throw error: missing session in db
+                throw new UnauthorizedException("missing session in db");
             }
 
             $promote = $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['parentRefreshTokenHash1']);
@@ -145,8 +146,7 @@ class Session {
             }
 
             DB::commit();
-            throw new Error("some error");
-            // throw error: using access token whose refresh token is no more.
+            throw new UnauthorizedException("using access token whose refresh token is no more.");
         } catch(Exception $e) {
             DB::rollBack();
             throw $e;
@@ -156,7 +156,7 @@ class Session {
     /**
      * @param $refreshToken
      * @return array
-     * @throws Exception
+     * @throws SuperTokensAuthException | Exception
      */
     public function refreshSession($refreshToken) {
         $refreshTokenInfo = RefreshToken::getInfoFromRefreshToken($refreshToken);
@@ -167,7 +167,7 @@ class Session {
      * @param $refreshToken
      * @param $refreshTokenInfo
      * @return array
-     * @throws Exception
+     * @throws SuperTokensAuthException | Exception
      */
     public function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
@@ -179,12 +179,12 @@ class Session {
             $currentTimestamp = $date->getTimestamp();
             if (!isset($sessionInfo) || $sessionInfo['expiresAt'] < $currentTimestamp) {
                 DB::commit();
-                // throw error: session does not exist or has expired
+                throw new UnauthorizedException("session does not exist or has expired");
             }
 
             if ($sessionInfo['userId'] !== $refreshTokenInfo['userId']) {
                 DB::commit();
-                // throw error: userId for session does not match the userId in the refresh token
+                throw new UnauthorizedException("userId for session does not match the userId in the refresh token");
             }
 
             if ($sessionInfo['refreshTokenHash2'] === Utils::hashString(Utils::hashString($refreshToken))) {
@@ -248,8 +248,7 @@ class Session {
             }
 
             DB::commit();
-            throw new Error("token theft");
-            // throw error: token theft detected!
+            throw new UnauthorizedException("token theft detected!");
         } catch (Exception $e) {
             DB::rollBack();
             throw $e;
@@ -285,12 +284,12 @@ class Session {
     /**
      * @param $sessionHandle
      * @return mixed
+     * @throws UnauthorizedException
      */
     public function getSessionData($sessionHandle) {
         $result = RefreshTokenDb::getSessionData($sessionHandle);
         if (!$result['found']) {
-            throw new Error();
-            // throw error: session does not exist anymore
+            throw new UnauthorizedException("session does not exist anymore");
         }
         return $result['data'];
     }

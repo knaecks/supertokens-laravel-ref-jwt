@@ -2,11 +2,12 @@
 
 namespace SuperTokens\Laravel\Helpers;
 
-use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Laravel\Db\SigningKeyDb;
+use SuperTokens\Laravel\Exceptions\GeneralException;
+use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
 
 define("ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB", "access_token_signing_key");
 
@@ -56,7 +57,7 @@ class AccessTokenSigningKey {
     }
 
     /**
-     * @throws Exception
+     * @throws SuperTokensAuthException
      */
     public static function init() {
         if (!isset(AccessTokenSigningKey::$instance)) {
@@ -66,36 +67,39 @@ class AccessTokenSigningKey {
     }
 
     /**
-     * @return mixed|string
+     * @return string
      * @throws Exception
      */
     private function getKeyFromInstance() {
-        // wrap around error
-        if (isset($this->userDefinedGet)) {
-            return $this->userDefinedGet();
+        try {
+            if (isset($this->userDefinedGet)) {
+                return $this->userDefinedGet();
+            }
+
+            if (!isset($instance->signingKey)) {
+                $this->signingKey = $this->maybeGenerateNewKeyAndUpdateInDb();
+            }
+
+            $currentTime = Utils::getDateTimeStamp();
+
+            if ($this->isDynamic && $currentTime > ($this->createdAtTime + $this->updateInterval)) {
+                // key has expired, we need to change it.
+                $this->signingKey = $this->maybeGenerateNewKeyAndUpdateInDb();
+            }
+
+            return $this->signingKey;
+        } catch (Exception $e) {
+            throw $e;
         }
-
-        if (!isset($instance->signingKey)) {
-            $this->signingKey = $this->maybeGenerateNewKeyAndUpdateInDb();
-        }
-
-        $currentTime = Utils::getDateTimeStamp();
-
-        if ($this->isDynamic && $currentTime > ($this->createdAtTime + $this->updateInterval)) {
-            // key has expired, we need to change it.
-            $this->signingKey = $this->maybeGenerateNewKeyAndUpdateInDb();
-        }
-
-        return $this->signingKey;
     }
 
     /**
      * @return string
-     * @throws Exception
+     * @throws SuperTokensAuthException | Exception
      */
     public static function getKey() {
         if (!isset(AccessTokenSigningKey::$instance)) {
-            throw new Error('');
+            throw new GeneralException("please call init function of access token signing key");
         }
 
         return AccessTokenSigningKey::$instance->getKeyFromInstance();
@@ -139,19 +143,16 @@ class AccessTokenSigningKey {
     }
 
     /**
-     *
+     * @throws SuperTokensAuthException
      */
     public static function removeKeyFromMemory() {
         if (!isset(AccessTokenSigningKey::$instance)) {
-            throw new Error('');
+            throw new GeneralException("please call init function of access token signing key");
         }
 
         AccessTokenSigningKey::$instance->removeKeyFromMemoryInInstance();
     }
 
-    /**
-     *
-     */
     private function removeKeyFromMemoryInInstance() {
         $this->signingKey = null;
         $this->createdAtTime = null;

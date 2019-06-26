@@ -1,6 +1,7 @@
 <?php
 
 namespace SuperTokens\Laravel\Helpers;
+use Exception;
 
 class Jwt {
 
@@ -30,24 +31,25 @@ class Jwt {
      * @param $jwt
      * @param $signingKey
      * @return mixed
+     * @throws Exception
      */
     public static function verifyJWTAndGetPayload($jwt, $signingKey) {
         $splittedInput = explode(".", $jwt);
         $header = Jwt::getHeader();
 
         if (count($splittedInput) !== 3) {
-            // throw error: invalid jwt
+            throw new Exception("invalid jwt");
         }
 
         if ($splittedInput[0] !== $header) {
-            // throw error: jwt header mismatch
+            throw new Exception("jwt header mismatch");
         }
 
         $payload = $splittedInput[1];
         $signatureFromHeaderAndPayload = Utils::hmac($header.".".$payload, $signingKey);
 
         if ($signatureFromHeaderAndPayload !== $splittedInput[2]) {
-            // throw error: jwt verification failed
+            throw new Exception("jwt verification failed");
         }
 
         $payload = base64_decode($payload);

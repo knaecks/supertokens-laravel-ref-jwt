@@ -6,6 +6,9 @@ use DateTime;
 use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
+use SuperTokens\Laravel\Exceptions\GeneralException;
+use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
+use SuperTokens\Laravel\Exceptions\TryRefreshTokenException;
 use SuperTokens\Laravel\Helpers\Utils;
 use SuperTokens\Laravel\Helpers\Jwt;
 use SuperTokens\Laravel\Helpers\AccessTokenSigningKey;
@@ -16,48 +19,52 @@ class AccessToken {
      * @param $token
      * @param bool $retry
      * @return array
-     * @throws Exception
+     * @throws SuperTokensAuthException
      */
     public static function getInfoFromAccessToken($token, $retry = true) {
 
         $key = AccessTokenSigningKey::getKey();
         try {
-            $payload = Jwt::verifyJWTAndGetPayload($token, $key);
-        } catch (Exception $e) {
-            if ($retry) {
-                AccessTokenSigningKey::removeKeyFromMemory();
-                return AccessToken::getInfoFromAccessToken($token, false);
-            } else {
-                throw $e;
+            try {
+                $payload = Jwt::verifyJWTAndGetPayload($token, $key);
+            } catch (Exception $e) {
+                if ($retry) {
+                    AccessTokenSigningKey::removeKeyFromMemory();
+                    return AccessToken::getInfoFromAccessToken($token, false);
+                } else {
+                    throw $e;
+                }
             }
-        }
-        $sessionHandle = Utils::sanitizeStringInput($payload['sessionHandle']);
-        $userId = Utils::sanitizeStringInput($payload['userId']);
-        $refreshTokenHash1 = Utils::sanitizeStringInput($payload['rt']);
-        $expiryTime = Utils::sanitizeNumberInput($payload['expiryTime']);
-        $parentRefreshTokenHash1 = Utils::sanitizeStringInput($payload['prt']);
-        $userPayload = $payload['userPayload'];
+            $sessionHandle = Utils::sanitizeStringInput($payload['sessionHandle']);
+            $userId = Utils::sanitizeStringInput($payload['userId']);
+            $refreshTokenHash1 = Utils::sanitizeStringInput($payload['rt']);
+            $expiryTime = Utils::sanitizeNumberInput($payload['expiryTime']);
+            $parentRefreshTokenHash1 = Utils::sanitizeStringInput($payload['prt']);
+            $userPayload = $payload['userPayload'];
 
-        if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime)) {
-            // it would come here if we change the structure of the JWT.
-            // throw error
-            throw new Error("");
-        }
-        $date = new DateTime();
-        $currentTimestamp = $date->getTimestamp();
-        if ($expiryTime < $currentTimestamp) {
-            throw new Error("");
-            // throw Error("expired access token");
-        }
+            if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime)) {
+                // it would come here if we change the structure of the JWT.
+                // throw error
+                throw new Error("");
+            }
+            $date = new DateTime();
+            $currentTimestamp = $date->getTimestamp();
+            if ($expiryTime < $currentTimestamp) {
+                throw new Error("");
+                // throw Error("expired access token");
+            }
 
-        return [
-            'sessionHandle' => $sessionHandle,
-            'userId' => $userId,
-            'refreshTokenHash1' => $refreshTokenHash1,
-            'expiryTime' => $expiryTime,
-            'parentRefreshTokenHash1' => $parentRefreshTokenHash1,
-            'userPayload' => $userPayload,
-        ];
+            return [
+                'sessionHandle' => $sessionHandle,
+                'userId' => $userId,
+                'refreshTokenHash1' => $refreshTokenHash1,
+                'expiryTime' => $expiryTime,
+                'parentRefreshTokenHash1' => $parentRefreshTokenHash1,
+                'userPayload' => $userPayload,
+            ];
+        } catch (Exception $e) {
+            throw new TryRefreshTokenException($e->getMessage());
+        }
     }
 
     /**
@@ -67,28 +74,32 @@ class AccessToken {
      * @param $parentRefreshTokenHash1
      * @param $userPayload
      * @return array
-     * @throws Exception
+     * @throws SuperTokensAuthException
      */
     public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload) {
 
-        $key = AccessTokenSigningKey::getKey();
-        $validity = Config::get('supertokens.tokens.accessToken.validity');
-        $date = new DateTime();
-        $currentTimestamp = $date->getTimestamp();
-        $expiry = $currentTimestamp + $validity;
+        try {
+            $key = AccessTokenSigningKey::getKey();
+            $validity = Config::get('supertokens.tokens.accessToken.validity');
+            $date = new DateTime();
+            $currentTimestamp = $date->getTimestamp();
+            $expiry = $currentTimestamp + $validity;
 
-        $token = Jwt::createJWT([
-            'sessionHandle' => $sessionHandle,
-            'userId' => $userId,
-            'rt' => $refreshTokenHash1,
-            'prt' => $parentRefreshTokenHash1,
-            'expiryTime' => $expiry,
-            'userPayload' => $userPayload
-        ], $key);
+            $token = Jwt::createJWT([
+                'sessionHandle' => $sessionHandle,
+                'userId' => $userId,
+                'rt' => $refreshTokenHash1,
+                'prt' => $parentRefreshTokenHash1,
+                'expiryTime' => $expiry,
+                'userPayload' => $userPayload
+            ], $key);
 
-        return [
-            'token' => $token,
-            'expiry' => $expiry
-        ];
+            return [
+                'token' => $token,
+                'expiry' => $expiry
+            ];
+        } catch (Exception $e) {
+            throw new GeneralException($e->getMessage());
+        }
     }
 }

@@ -2,10 +2,11 @@
 
 namespace SuperTokens\Laravel\Helpers;
 
-use Error;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Laravel\Db\SigningKeyDb;
+use SuperTokens\Laravel\Exceptions\GeneralException;
+use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
 
 define("REFRESH_TOKEN_KEY_NAME_IN_DB", "refresh_token_key");
 
@@ -27,7 +28,7 @@ class RefreshTokenSigningKey {
     private function __construct() {}
 
     /**
-     * @throws Exception
+     * @throws SuperTokensAuthException | Exception
      */
     public static function init() {
         if (!isset(RefreshTokenSigningKey::$instance)) {
@@ -37,19 +38,19 @@ class RefreshTokenSigningKey {
     }
 
     /**
-     * @return mixed|string
-     * @throws Exception
+     * @return string
+     * @throws SuperTokensAuthException | Exception
      */
     public static function getKey() {
         if (!isset(RefreshTokenSigningKey::$instance)) {
-            throw new Error('');
+            throw new GeneralException('please call init function of refresh token key');
         }
 
         return RefreshTokenSigningKey::$instance->getKeyFromInstance();
     }
 
     /**
-     * @return mixed|string
+     * @return string
      * @throws Exception
      */
     private function getKeyFromInstance() {
