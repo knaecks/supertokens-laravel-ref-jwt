@@ -1,12 +1,12 @@
 <?php
 
-namespace SuperTokens\Laravel\Db;
+namespace SuperTokens\Session\Db;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
-use SuperTokens\Laravel\Exceptions\GeneralException;
-use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
-use SuperTokens\Laravel\Models\SigningKeyModel;
+use SuperTokens\Session\Exceptions\GeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Models\SigningKeyModel;
 
 class SigningKeyDb {
 

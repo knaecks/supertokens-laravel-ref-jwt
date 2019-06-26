@@ -1,17 +1,17 @@
 <?php
 
-namespace SuperTokens\Laravel;
+namespace SuperTokens\Session;
 
 use DateTime;
 use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
-use SuperTokens\Laravel\Exceptions\GeneralException;
-use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
-use SuperTokens\Laravel\Exceptions\TryRefreshTokenException;
-use SuperTokens\Laravel\Helpers\Utils;
-use SuperTokens\Laravel\Helpers\Jwt;
-use SuperTokens\Laravel\Helpers\AccessTokenSigningKey;
+use SuperTokens\Session\Exceptions\GeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\TryRefreshTokenException;
+use SuperTokens\Session\Helpers\Utils;
+use SuperTokens\Session\Helpers\Jwt;
+use SuperTokens\Session\Helpers\AccessTokenSigningKey;
 
 class AccessToken {
 

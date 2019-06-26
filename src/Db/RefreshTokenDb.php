@@ -1,16 +1,16 @@
 <?php
 
-namespace SuperTokens\Laravel\Db;
+namespace SuperTokens\Session\Db;
 
 use Exception;
-use SuperTokens\Laravel\Exceptions\GeneralException;
-use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
-use SuperTokens\Laravel\Helpers\Utils;
-use SuperTokens\Laravel\Models\RefreshTokenModel;
+use SuperTokens\Session\Exceptions\GeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Helpers\Utils;
+use SuperTokens\Session\Models\RefreshTokenModel;
 
 /**
  * Class RefreshTokenDb
- * @package SuperTokens\Laravel\Db
+ * @package SuperTokens\Session\Db
  */
 class RefreshTokenDb {
 

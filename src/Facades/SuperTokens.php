@@ -1,6 +1,6 @@
 <?php
 
-namespace  SuperTokens\Laravel\Facades;
+namespace  SuperTokens\Session\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

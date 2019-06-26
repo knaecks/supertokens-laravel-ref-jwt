@@ -1,9 +1,9 @@
 <?php
 
-namespace SuperTokens\Laravel\Providers;
+namespace SuperTokens\Session\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use SuperTokens\Laravel\Session;
+use SuperTokens\Session\Session;
 
 class SuperTokensServiceProvider extends ServiceProvider {
     /**

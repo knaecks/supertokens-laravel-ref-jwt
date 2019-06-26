@@ -1,12 +1,12 @@
 <?php
 
-namespace SuperTokens\Laravel\Helpers;
+namespace SuperTokens\Session\Helpers;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
-use SuperTokens\Laravel\Db\SigningKeyDb;
-use SuperTokens\Laravel\Exceptions\GeneralException;
-use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Db\SigningKeyDb;
+use SuperTokens\Session\Exceptions\GeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensAuthException;
 
 define("REFRESH_TOKEN_KEY_NAME_IN_DB", "refresh_token_key");
 

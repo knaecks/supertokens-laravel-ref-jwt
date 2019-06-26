@@ -1,6 +1,6 @@
 <?php
 
-namespace SuperTokens\Laravel\Helpers;
+namespace SuperTokens\Session\Helpers;
 use Exception;
 
 class Jwt {

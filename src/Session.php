@@ -1,32 +1,39 @@
 <?php
 
-namespace SuperTokens\Laravel;
+namespace SuperTokens\Session;
 
 use DateTime;
-use Error;
+use Closure;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
-use SuperTokens\Laravel\Exceptions\UnauthorizedException;
-use SuperTokens\Laravel\Helpers\Utils;
-use SuperTokens\Laravel\Db\RefreshTokenDb;
-use SuperTokens\Laravel\Helpers\AccessTokenSigningKey;
-use SuperTokens\Laravel\Helpers\RefreshTokenSigningKey;
+use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\UnauthorizedException;
+use SuperTokens\Session\Helpers\Utils;
+use SuperTokens\Session\Db\RefreshTokenDb;
+use SuperTokens\Session\Helpers\AccessTokenSigningKey;
+use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 
 /**
  * Class Session
- * @package SuperTokens\Laravel
+ * @package SuperTokens\Session
  */
 class Session {
+
+    /**
+     * @var bool
+     */
+    private static $isInitiated = false;
 
     /**
      * Session constructor.
      * @throws Exception
      */
-    public function __construct() {
-        AccessTokenSigningKey::init();
-        RefreshTokenSigningKey::init();
+    public function __construct(Closure $getSigningKey = null) {
+        if (!Session::$isInitiated) {
+            AccessTokenSigningKey::init($getSigningKey);
+            RefreshTokenSigningKey::init();
+        }
     }
 
     /**

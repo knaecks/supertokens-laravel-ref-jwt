@@ -1,6 +1,6 @@
 <?php
 
-namespace SuperTokens\Laravel\Exceptions;
+namespace SuperTokens\Session\Exceptions;
 use Exception;
 
 class GeneralException extends SuperTokensAuthException {

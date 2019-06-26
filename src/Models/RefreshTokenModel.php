@@ -1,5 +1,5 @@
 <?php
-namespace SuperTokens\Laravel\Models;
+namespace SuperTokens\Session\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

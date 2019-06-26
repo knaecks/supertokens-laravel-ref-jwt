@@ -1,16 +1,16 @@
 <?php
 
-namespace SuperTokens\Laravel;
+namespace SuperTokens\Session;
 
 use Error;
 use Exception;
 use DateTime;
 use Illuminate\Support\Facades\Config;
-use SuperTokens\Laravel\Exceptions\GeneralException;
-use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
-use SuperTokens\Laravel\Exceptions\UnauthorizedException;
-use SuperTokens\Laravel\Helpers\Utils;
-use SuperTokens\Laravel\Helpers\RefreshTokenSigningKey;
+use SuperTokens\Session\Exceptions\GeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\UnauthorizedException;
+use SuperTokens\Session\Helpers\Utils;
+use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 
 class RefreshToken {
 

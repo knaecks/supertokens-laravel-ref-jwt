@@ -1,13 +1,14 @@
 <?php
 
-namespace SuperTokens\Laravel\Helpers;
+namespace SuperTokens\Session\Helpers;
 
+use Closure;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use SuperTokens\Laravel\Db\SigningKeyDb;
-use SuperTokens\Laravel\Exceptions\GeneralException;
-use SuperTokens\Laravel\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Db\SigningKeyDb;
+use SuperTokens\Session\Exceptions\GeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensAuthException;
 
 define("ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB", "access_token_signing_key");
 
@@ -28,7 +29,7 @@ class AccessTokenSigningKey {
     private $signingKey;
 
     /**
-     * @var mixed
+     * @var Closure
      */
     private $userDefinedGet;
 
@@ -50,18 +51,22 @@ class AccessTokenSigningKey {
     /**
      * AccessTokenSigningKey constructor.
      */
-    private function __construct() {
+    private function __construct(Closure $getSigningKey = null) {
         $this->isDynamic = Config::get('supertokens.tokens.accessToken.signingKey.dynamic');
         $this->updateInterval = Config::get('supertokens.tokens.accessToken.signingKey.updateInterval');
-        $this->userDefinedGet = Config::get('supertokens.tokens.accessToken.signingKey.get');
+        if ($getSigningKey !== null && is_callable($getSigningKey)) {
+            $this->userDefinedGet = $getSigningKey;
+        } else {
+            $this->userDefinedGet = Config::get('supertokens.tokens.accessToken.signingKey.get');
+        }
     }
 
     /**
      * @throws SuperTokensAuthException
      */
-    public static function init() {
+    public static function init(Closure $getSigningKey = null) {
         if (!isset(AccessTokenSigningKey::$instance)) {
-            AccessTokenSigningKey::$instance = new AccessTokenSigningKey();
+            AccessTokenSigningKey::$instance = new AccessTokenSigningKey($getSigningKey);
             AccessTokenSigningKey::getKey();
         }
     }
