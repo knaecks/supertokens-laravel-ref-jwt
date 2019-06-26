@@ -33,6 +33,7 @@ class Session {
         if (!Session::$isInitiated) {
             AccessTokenSigningKey::init($getSigningKey);
             RefreshTokenSigningKey::init();
+            Session::$isInitiated = true;
         }
     }
 
