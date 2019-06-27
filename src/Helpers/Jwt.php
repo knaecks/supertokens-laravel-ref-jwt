@@ -53,6 +53,6 @@ class Jwt {
         }
 
         $payload = base64_decode($payload);
-        return json_decode($payload);
+        return json_decode($payload, true);
     }
 }

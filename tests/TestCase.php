@@ -5,7 +5,7 @@ namespace SuperTokens\Session\Tests;
 use SuperTokens\Session\Providers\SuperTokensServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
-class TestCase extends BaseTestCase {
+abstract class TestCase extends BaseTestCase {
 
     /**
      * @param \Illuminate\Foundation\Application $app
