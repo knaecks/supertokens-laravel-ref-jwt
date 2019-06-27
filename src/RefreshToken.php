@@ -2,7 +2,6 @@
 
 namespace SuperTokens\Session;
 
-use Error;
 use Exception;
 use DateTime;
 use Illuminate\Support\Facades\Config;

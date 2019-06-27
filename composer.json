@@ -5,15 +5,20 @@
     "license": "MIT",
     "minimum-stability": "dev",
     "require": {
+        "ramsey/uuid": "3.8.0",
         "illuminate/database": "^5.9@dev",
-        "ramsey/uuid": "^4.0@dev",
+        "illuminate/http": "^5.9@dev",
         "ext-json": "^1.6",
-        "ext-openssl": "^7.2",
-        "illuminate/http": "^5.9@dev"
+        "ext-openssl": "^7.2"
     },
     "autoload": {
         "psr-4": {
             "SuperTokens\\Session\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SuperTokens\\Session\\Tests\\": "tests"
         }
     },
     "extra": {
@@ -22,5 +27,8 @@
                 "SuperTokens\\Session\\Providers\\SuperTokensServiceProvider"
             ]
         }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^3.10@dev"
     }
 }
