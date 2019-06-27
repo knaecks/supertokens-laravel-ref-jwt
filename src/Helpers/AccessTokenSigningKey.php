@@ -73,7 +73,7 @@ class AccessTokenSigningKey {
     private function getKeyFromInstance() {
         try {
             if (isset($this->userDefinedGet)) {
-                return $this->userDefinedGet();
+                return call_user_func($this->userDefinedGet);
             }
 
             if (!isset($instance->signingKey)) {
@@ -156,5 +156,9 @@ class AccessTokenSigningKey {
     private function removeKeyFromMemoryInInstance() {
         $this->signingKey = null;
         $this->createdAtTime = null;
+    }
+
+    public static function resetInstance() {
+        AccessTokenSigningKey::$instance = null;
     }
 }

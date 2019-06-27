@@ -45,13 +45,12 @@ class AccessToken {
             if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime)) {
                 // it would come here if we change the structure of the JWT.
                 // throw error
-                throw new Error("");
+                throw new SuperTokensAuthException("invalid access token payload");
             }
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
             if ($expiryTime < $currentTimestamp) {
-                throw new Error("");
-                // throw Error("expired access token");
+                throw new SuperTokensAuthException("expired access token");
             }
 
             return [
@@ -84,7 +83,6 @@ class AccessToken {
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
             $expiry = $currentTimestamp + $validity;
-
             $token = Jwt::createJWT([
                 'sessionHandle' => $sessionHandle,
                 'userId' => $userId,
