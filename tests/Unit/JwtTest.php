@@ -4,7 +4,6 @@ namespace SuperTokens\Session\Tests;
 
 use Exception;
 use SuperTokens\Session\Helpers\Jwt;
-use PHPUnit\Framework;
 
 class JwtTest extends TestCase
 {
@@ -38,7 +37,7 @@ class JwtTest extends TestCase
         $signature = 'supertokens2';
         $error = false;
         try {
-            $payloadFromJwt = Jwt::verifyJWTAndGetPayload($jwt, $signature);
+            Jwt::verifyJWTAndGetPayload($jwt, $signature);
             $error = true;
         } catch (Exception $e) {
             $this->assertTrue(true);
