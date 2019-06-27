@@ -18,6 +18,7 @@ class CreateRefreshTokenTable extends Migration
             $table->text('session_info');
             $table->bigInteger('expires_at')->unsigned();
             $table->text('jwt_user_payload');
+            $table->timestamps();
         });
     }
     /**

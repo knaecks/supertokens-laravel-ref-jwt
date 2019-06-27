@@ -9,4 +9,6 @@ use Illuminate\Database\Eloquent\Model;
  * @package SuperTokens\Laravel\Models
  * @mixin Builder
  */
-class RefreshTokenModel extends Model {}
+class RefreshTokenModel extends Model {
+    protected $table = "refresh_token";
+}

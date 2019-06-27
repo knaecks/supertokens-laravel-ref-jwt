@@ -40,10 +40,9 @@ class SigningKeyDb {
         try {
             $signingKey = new SigningKeyModel;
             $signingKey->updateOrInsert(
-                ['key_name', 'key_value', 'created_at_time'],
-                [$keyName, $keyValue, $createdAtTime]
+                ['key_name' => $keyName],
+                ['key_name' => $keyName, 'key_value' => $keyValue, 'created_at_time' => $createdAtTime]
             );
-            $signingKey->save();
         } catch (Exception $e) {
             throw new GeneralException($e->getMessage());
         }
