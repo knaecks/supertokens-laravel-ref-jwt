@@ -496,4 +496,37 @@ class SessionTest extends TestCase {
             $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
         }
     }
+
+    /**
+     * @throws SuperTokensAuthException | Exception
+     */
+    public function testUpdateSessionInfo() {
+        RefreshTokenSigningKey::resetInstance();
+        AccessTokenSigningKey::resetInstance();
+        Config::set('supertokens.tokens.accessToken.blacklisting', true);
+        new Session();
+
+        $userId = "testing";
+        $jwtPayload = [
+            "a" => "testing"
+        ];
+        $sessionData = [
+            "s" => "session"
+        ];
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $this->assertIsArray($newSession);
+        $this->assertIsArray($newSession['session']);
+        $this->assertArrayHasKey("handle", $newSession['session']);
+        $this->assertIsString($newSession['session']['handle']);
+
+        $sessionDataBeforeUpdate = Session::getSessionData($newSession['session']['handle']);
+        $this->assertEquals($sessionDataBeforeUpdate, $sessionData);
+
+        $newSessionData = 2;
+        Session::updateSessionData($newSession['session']['handle'], $newSessionData);
+
+        $sessionDataPostUpdate = Session::getSessionData($newSession['session']['handle']);
+        $this->assertEquals($sessionDataPostUpdate, $newSessionData);
+    }
 }

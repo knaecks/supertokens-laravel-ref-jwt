@@ -3,7 +3,6 @@
 namespace SuperTokens\Session;
 
 use DateTime;
-use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -166,7 +165,7 @@ class Session {
      * @param $refreshToken
      * @param $refreshTokenInfo
      * @return array
-     * @throws SuperTokensAuthException | Exception
+     * @throws Exception
      */
     public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
@@ -256,7 +255,7 @@ class Session {
 
     /**
      * @param $userId
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function revokeAllSessionsForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
@@ -268,7 +267,7 @@ class Session {
     /**
      * @param $userId
      * @return array
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function getAllSessionHandlesForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
@@ -277,7 +276,7 @@ class Session {
 
     /**
      * @param $sessionHandle
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function revokeSessionUsingSessionHandle($sessionHandle) {
         RefreshTokenDb::deleteSession($sessionHandle);
@@ -286,7 +285,7 @@ class Session {
     /**
      * @param $sessionHandle
      * @return mixed
-     * @throws SuperTokensAuthException
+     * @throws Exception
      * @throws UnauthorizedException
      */
     public static function getSessionData($sessionHandle) {
@@ -300,7 +299,7 @@ class Session {
     /**
      * @param $sessionHandle
      * @param $newSessionData
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensAuthException | Exception
      */
     public static function updateSessionData($sessionHandle, $newSessionData) {
         $result = RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
