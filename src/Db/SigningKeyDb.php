@@ -48,4 +48,15 @@ class SigningKeyDb {
         }
     }
 
+    /**
+     * @param $keyName
+     * @throws SuperTokensAuthException
+     */
+    public static function removeKeyValueForKeyName($keyName) {
+        try {
+            SigningKeyModel::where('key_name', '=', $keyName)->delete();
+        } catch (Exception $e) {
+            throw new GeneralException($e->getMessage());
+        }
+    }
 }

@@ -30,7 +30,7 @@ class RefreshToken {
             $nonce = $splittedToken[1];
 
             // decrpyt and json parse to get following variable
-            $payload = json_decode(Utils::decrypt($splittedToken[0], $key));
+            $payload = json_decode(Utils::decrypt($splittedToken[0], $key), true);
             $sessionHandle = Utils::sanitizeStringInput($payload['sessionHandle']);
             $userId = Utils::sanitizeStringInput($payload['userId']);
             $parentRefreshTokenHash1 = Utils::sanitizeStringInput($payload['prt']);

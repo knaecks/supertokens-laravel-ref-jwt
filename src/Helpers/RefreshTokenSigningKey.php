@@ -85,4 +85,12 @@ class RefreshTokenSigningKey {
             throw $e;
         }
     }
+
+    /**
+     * @throws GeneralException
+     */
+    public static function resetInstance() {
+        SigningKeyDb::removeKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
+        RefreshTokenSigningKey::$instance = null;
+    }
 }
