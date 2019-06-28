@@ -115,7 +115,7 @@ class Session {
                     $validity = Config::get('supertokens.tokens.refreshToken.validity');
                     $date = new DateTime();
                     $currentTimestamp = $date->getTimestamp();
-                    $expiresAt = $currentTimestamp + $validity;
+                    $expiresAt = $currentTimestamp + ($validity * 60 * 60);
                     RefreshTokenDb::updateSessionInfo(
                         $sessionHandle,
                         Utils::hashString($accessTokenInfo['refreshTokenHash1']),
@@ -234,7 +234,7 @@ class Session {
                 $validity = Config::get('supertokens.tokens.refreshToken.validity');
                 $date = new DateTime();
                 $currentTimestamp = $date->getTimestamp();
-                $expiresAt = $currentTimestamp + $validity;
+                $expiresAt = $currentTimestamp + ($validity * 60 * 60);
                 RefreshTokenDb::updateSessionInfo(
                     $sessionHandle,
                     Utils::hashString(Utils::hashString($refreshToken)),

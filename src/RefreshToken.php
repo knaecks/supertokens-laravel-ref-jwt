@@ -73,7 +73,7 @@ class RefreshToken {
             $validity = Config::get('supertokens.tokens.refreshToken.validity');
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
-            $expiry = $currentTimestamp + $validity;
+            $expiry = $currentTimestamp + ($validity * 60 * 60);
             return [
                 'token' => $token,
                 'expiry' => $expiry

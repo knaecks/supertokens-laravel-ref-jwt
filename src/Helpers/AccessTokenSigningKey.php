@@ -52,7 +52,7 @@ class AccessTokenSigningKey {
      */
     private function __construct() {
         $this->isDynamic = Config::get('supertokens.tokens.accessToken.signingKey.dynamic');
-        $this->updateInterval = Config::get('supertokens.tokens.accessToken.signingKey.updateInterval');
+        $this->updateInterval = Config::get('supertokens.tokens.accessToken.signingKey.updateInterval') * 60 * 60;
         $this->userDefinedGet = Config::get('supertokens.tokens.accessToken.signingKey.get');
     }
 

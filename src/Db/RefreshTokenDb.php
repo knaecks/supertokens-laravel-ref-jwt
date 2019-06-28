@@ -4,7 +4,6 @@ namespace SuperTokens\Session\Db;
 
 use Exception;
 use SuperTokens\Session\Exceptions\GeneralException;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
 use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Models\RefreshTokenModel;
 
@@ -17,14 +16,14 @@ class RefreshTokenDb {
     /**
      * @param $sessionHandle
      * @return bool
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function isSessionBlacklisted($sessionHandle) {
         try {
             $noOfRows = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->count();
             return $noOfRows === 0;
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
@@ -35,7 +34,7 @@ class RefreshTokenDb {
      * @param $sessionData
      * @param $expiresAt
      * @param $jwtPayload
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function createNewSessionInDB($sessionHandle, $userId, $refreshTokenHash2, $sessionData, $expiresAt, $jwtPayload) {
         try {
@@ -48,14 +47,14 @@ class RefreshTokenDb {
             $sessionForDb->jwt_user_payload = Utils::serializeData($jwtPayload);
             $sessionForDb->save();
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
     /**
      * @param $sessionHandle
      * @return array|null
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function getSessionInfo($sessionHandle) {
         try {
@@ -71,7 +70,7 @@ class RefreshTokenDb {
                 'jwtPayload' => Utils::unserializeData($result->jwt_user_payload),
             ];
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
@@ -80,7 +79,7 @@ class RefreshTokenDb {
      * @param $refreshTokenHash2
      * @param $sessionData
      * @param $expiresAt
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function updateSessionInfo($sessionHandle, $refreshTokenHash2, $sessionData, $expiresAt) {
         try {
@@ -91,14 +90,14 @@ class RefreshTokenDb {
                     'expires_at' => $expiresAt
                 ]);
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
     /**
      * @param $userId
      * @return array
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function getAllSessionHandlesForUser($userId) {
         try {
@@ -109,26 +108,26 @@ class RefreshTokenDb {
             }
             return $sessionHandles;
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
     /**
      * @param $sessionHandle
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function deleteSession($sessionHandle) {
         try {
             RefreshTokenModel::where('session_handle', '=', $sessionHandle)->delete();
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
     /**
      * @param $sessionHandle
      * @return array
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function getSessionData($sessionHandle) {
         try {
@@ -143,7 +142,7 @@ class RefreshTokenDb {
                 'data' => Utils::unserializeData($session->session_info)
             ];
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
@@ -151,7 +150,7 @@ class RefreshTokenDb {
      * @param $sessionHandle
      * @param $sessionData
      * @return bool
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function updateSessionData($sessionHandle, $sessionData){
         try {
@@ -165,7 +164,7 @@ class RefreshTokenDb {
                 ]);
             return true;
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 }

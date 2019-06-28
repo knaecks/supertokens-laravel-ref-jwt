@@ -16,7 +16,7 @@ class SessionTest extends TestCase {
     use RefreshDatabase;
 
     /**
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensAuthException | Exception
      */
     public function testCreateAndGetSession() {
         RefreshTokenSigningKey::resetInstance();
@@ -311,5 +311,83 @@ class SessionTest extends TestCase {
         $this->assertArrayHasKey("session", $sessionInfo2);
         $this->assertArrayHasKey("newAccessToken", $sessionInfo2);
         $this->assertNotEquals($sessionInfo2['newAccessToken']['value'], $sessionInfo['newAccessToken']['value']);
+    }
+
+    /**
+     * @throws SuperTokensAuthException | Exception
+     */
+    public function testRefreshSessionWithRefreshTokenValidityLessThanThreeSec() {
+        RefreshTokenSigningKey::resetInstance();
+        AccessTokenSigningKey::resetInstance();
+        Config::set('supertokens.tokens.refreshToken.validity', 0.0008);
+        new Session();
+
+        $userId = "testing";
+        $jwtPayload = [
+            "a" => "testing"
+        ];
+        $sessionData = [
+            "s" => "session"
+        ];
+
+        // Part 1
+        {
+            $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+            $this->assertIsArray($newSession);
+            $this->assertArrayHasKey("refreshToken", $newSession);
+            $this->assertIsArray($newSession['refreshToken']);
+            $this->assertArrayHasKey("value", $newSession['refreshToken']);
+            $this->assertIsString($newSession['refreshToken']['value']);
+
+            $newRefreshedSession = Session::refreshSession($newSession['refreshToken']['value']);
+            $this->assertIsArray($newRefreshedSession);
+            $this->assertArrayHasKey("newAccessToken", $newRefreshedSession);
+            $this->assertIsArray($newRefreshedSession['newAccessToken']);
+            $this->assertArrayHasKey("value", $newRefreshedSession['newAccessToken']);
+
+            $sessionInfo = Session::getSession($newRefreshedSession['newAccessToken']['value']);
+            $this->assertIsArray($sessionInfo);
+            $this->assertArrayHasKey("newAccessToken", $sessionInfo);
+            $this->assertArrayHasKey("value", $sessionInfo['newAccessToken']);
+            $this->assertIsString($sessionInfo['newAccessToken']['value']);
+            $this->assertNotEquals($newRefreshedSession['newAccessToken']['value'], $sessionInfo['newAccessToken']['value']);
+
+            sleep(3);
+            try {
+                Session::refreshSession($newRefreshedSession['newRefreshToken']['value']);
+            } catch (SuperTokensAuthException $e) {
+                $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+            }
+        }
+
+        // Part 2
+        {
+            $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+            $this->assertIsArray($newSession);
+            $this->assertArrayHasKey("refreshToken", $newSession);
+            $this->assertIsArray($newSession['refreshToken']);
+            $this->assertArrayHasKey("value", $newSession['refreshToken']);
+            $this->assertIsString($newSession['refreshToken']['value']);
+
+            $newRefreshedSession = Session::refreshSession($newSession['refreshToken']['value']);
+            $this->assertIsArray($newRefreshedSession);
+            $this->assertArrayHasKey("newAccessToken", $newRefreshedSession);
+            $this->assertIsArray($newRefreshedSession['newAccessToken']);
+            $this->assertArrayHasKey("value", $newRefreshedSession['newAccessToken']);
+
+            sleep(2);
+            $newRefreshedSession2 = Session::refreshSession($newRefreshedSession['newRefreshToken']['value']);
+            $this->assertIsArray($newRefreshedSession2);
+            $this->assertArrayHasKey("newAccessToken", $newRefreshedSession2);
+            $this->assertIsArray($newRefreshedSession2['newAccessToken']);
+            $this->assertArrayHasKey("value", $newRefreshedSession2['newAccessToken']);
+
+            sleep(2);
+            $newRefreshedSession3 = Session::refreshSession($newRefreshedSession2['newRefreshToken']['value']);
+            $this->assertIsArray($newRefreshedSession3);
+            $this->assertArrayHasKey("newAccessToken", $newRefreshedSession3);
+            $this->assertIsArray($newRefreshedSession3['newAccessToken']);
+            $this->assertArrayHasKey("value", $newRefreshedSession3['newAccessToken']);
+        }
     }
 }

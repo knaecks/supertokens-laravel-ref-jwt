@@ -3,8 +3,6 @@
 namespace SuperTokens\Session\Db;
 
 use Exception;
-use SuperTokens\Session\Exceptions\GeneralException;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
 use SuperTokens\Session\Models\SigningKeyModel;
 
 class SigningKeyDb {
@@ -12,7 +10,7 @@ class SigningKeyDb {
     /**
      * @param $keyName
      * @return array|null
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function getKeyValueFromKeyName($keyName) {
         // check for transaction
@@ -26,7 +24,7 @@ class SigningKeyDb {
                 'createdAtTime' => $result->created_at_time
             ];
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
@@ -34,7 +32,7 @@ class SigningKeyDb {
      * @param $keyName
      * @param $keyValue
      * @param $createdAtTime
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function insertKeyValueForKeyName($keyName, $keyValue, $createdAtTime) {
         try {
@@ -44,19 +42,19 @@ class SigningKeyDb {
                 ['key_name' => $keyName, 'key_value' => $keyValue, 'created_at_time' => $createdAtTime]
             );
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 
     /**
      * @param $keyName
-     * @throws SuperTokensAuthException
+     * @throws Exception
      */
     public static function removeKeyValueForKeyName($keyName) {
         try {
             SigningKeyModel::where('key_name', '=', $keyName)->delete();
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw $e;
         }
     }
 }

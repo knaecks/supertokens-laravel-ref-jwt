@@ -13,7 +13,7 @@ class RefreshTokenTest extends TestCase {
     use RefreshDatabase;
 
     /**
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensAuthException | Exception
      */
     public function testCreateAndVerifyRefreshTokenSameSigningKey() {
         RefreshTokenSigningKey::resetInstance();

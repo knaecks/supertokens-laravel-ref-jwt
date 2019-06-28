@@ -87,7 +87,7 @@ class RefreshTokenSigningKey {
     }
 
     /**
-     * @throws GeneralException
+     * @throws Exception
      */
     public static function resetInstance() {
         SigningKeyDb::removeKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
