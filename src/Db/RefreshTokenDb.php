@@ -84,11 +84,12 @@ class RefreshTokenDb {
      */
     public static function updateSessionInfo($sessionHandle, $refreshTokenHash2, $sessionData, $expiresAt) {
         try {
-            $session = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->first();
-            $session->refresh_token_hash_2 = $refreshTokenHash2;
-            $session->session_info = Utils::serializeData($sessionData);
-            $session->expires_at = $expiresAt;
-            $session->save();
+            RefreshTokenModel::where('session_handle', '=', $sessionHandle)
+                ->update([
+                    'refresh_token_hash_2' => $refreshTokenHash2,
+                    'session_info' => Utils::serializeData($sessionData),
+                    'expires_at' => $expiresAt
+                ]);
         } catch (Exception $e) {
             throw new GeneralException($e->getMessage());
         }
@@ -158,8 +159,10 @@ class RefreshTokenDb {
             if ($session === null) {
                 return false;
             }
-            $session->session_info = Utils::serializeData($sessionData);
-            $session->save();
+            RefreshTokenModel::where('session_handle', '=', $sessionHandle)
+                ->update([
+                    'session_info' => Utils::serializeData($sessionData)
+                ]);
             return true;
         } catch (Exception $e) {
             throw new GeneralException($e->getMessage());

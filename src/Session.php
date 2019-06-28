@@ -95,8 +95,7 @@ class Session {
                     'handle' => $accessTokenInfo['sessionHandle'],
                     'userId' => $accessTokenInfo['userId'],
                     'jwtPayload' => $accessTokenInfo['userPayload'],
-                ],
-                'newAccessToken' => null
+                ]
             ];
         }
 
