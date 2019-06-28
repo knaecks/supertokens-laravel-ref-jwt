@@ -2,7 +2,6 @@
 
 namespace SuperTokens\Session\Providers;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use SuperTokens\Session\Session;
 
@@ -23,7 +22,6 @@ class SuperTokensServiceProvider extends ServiceProvider {
     public function boot() {
         $this->registerResources();
         $this->registerPublishing();
-        Schema::defaultStringLength(191);
     }
 
     private function registerResources() {

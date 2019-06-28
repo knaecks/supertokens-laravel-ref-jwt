@@ -11,6 +11,7 @@ class CreateRefreshTokenTable extends Migration
      */
     public function up()
     {
+        Schema::defaultStringLength(191);
         Schema::create('refresh_token', function (Blueprint $table) {
             $table->string('session_handle', 255)->primary();
             $table->string('user_id', 128);

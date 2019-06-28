@@ -13,6 +13,7 @@ class CreateSigningKeyTable extends Migration
      */
     public function up()
     {
+        Schema::defaultStringLength(191);
         Schema::create('signing_key', function (Blueprint $table) {
             $table->string('key_name', 128)->primary();
             $table->string('key_value', 255);
