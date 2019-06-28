@@ -36,7 +36,7 @@ class Session {
      * @return array
      * @throws SuperTokensAuthException | Exception
      */
-    public function createNewSession($userId, $jwtPayload, $sessionData) {
+    public static function createNewSession($userId, $jwtPayload, $sessionData) {
         $sessionHandle = Utils::generateSessionHandle();
         $refreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $userId, null);
         $accessToken = AccessToken::createNewAccessToken($sessionHandle, $userId, Utils::hashString($refreshToken['token']), null, $jwtPayload);
@@ -76,7 +76,7 @@ class Session {
      * @return array
      * @throws SuperTokensAuthException | Exception
      */
-    public function getSession($accessToken) {
+    public static function getSession($accessToken) {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
         $sessionHandle = $accessTokenInfo['sessionHandle'];
 
@@ -158,7 +158,7 @@ class Session {
      * @return array
      * @throws SuperTokensAuthException | Exception
      */
-    public function refreshSession($refreshToken) {
+    public static function refreshSession($refreshToken) {
         $refreshTokenInfo = RefreshToken::getInfoFromRefreshToken($refreshToken);
         return Session::refreshSessionHelper($refreshToken, $refreshTokenInfo);
     }
@@ -169,7 +169,7 @@ class Session {
      * @return array
      * @throws SuperTokensAuthException | Exception
      */
-    public function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
+    public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
         DB::beginTransaction();
         try {
@@ -259,7 +259,7 @@ class Session {
      * @param $userId
      * @throws SuperTokensAuthException
      */
-    public function revokeAllSessionsForUser($userId) {
+    public static function revokeAllSessionsForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
         for ($i = 0; $i < count($sessionHandles); $i++) {
             Session::revokeSessionUsingSessionHandle($sessionHandles[$i]);
@@ -271,7 +271,7 @@ class Session {
      * @return array
      * @throws SuperTokensAuthException
      */
-    public function getAllSessionHandlesForUser($userId) {
+    public static function getAllSessionHandlesForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
         return $sessionHandles;
     }
@@ -280,7 +280,7 @@ class Session {
      * @param $sessionHandle
      * @throws SuperTokensAuthException
      */
-    public function revokeSessionUsingSessionHandle($sessionHandle) {
+    public static function revokeSessionUsingSessionHandle($sessionHandle) {
         RefreshTokenDb::deleteSession($sessionHandle);
     }
 
@@ -290,7 +290,7 @@ class Session {
      * @throws SuperTokensAuthException
      * @throws UnauthorizedException
      */
-    public function getSessionData($sessionHandle) {
+    public static function getSessionData($sessionHandle) {
         $result = RefreshTokenDb::getSessionData($sessionHandle);
         if (!$result['found']) {
             throw new UnauthorizedException("session does not exist anymore");
@@ -303,7 +303,7 @@ class Session {
      * @param $newSessionData
      * @throws SuperTokensAuthException
      */
-    public function updateSessionData($sessionHandle, $newSessionData) {
+    public static function updateSessionData($sessionHandle, $newSessionData) {
         $result = RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
         if (!$result) {
             throw new UnauthorizedException("session does not exist anymore");

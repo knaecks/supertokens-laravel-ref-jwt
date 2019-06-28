@@ -63,7 +63,7 @@ class Utils {
      * @throws Exception
      */
     public static function generateUUID() {
-        return Uuid::uuid1()->getBytes();
+        return Uuid::uuid1()->toString();
     }
 
     /**

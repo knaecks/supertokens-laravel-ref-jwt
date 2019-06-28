@@ -2,7 +2,6 @@
 
 namespace SuperTokens\Session\Tests;
 
-use function FinalAnnotations\finalFoo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Exception;
