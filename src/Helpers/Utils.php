@@ -161,7 +161,7 @@ class Utils {
         if ($data === "") {
             return;
         }
-        return json_decode($data);
+        return json_decode($data, true);
     }
 
     /**
