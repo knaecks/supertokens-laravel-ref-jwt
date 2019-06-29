@@ -3,7 +3,7 @@
 namespace SuperTokens\Session\Db;
 
 use Exception;
-use SuperTokens\Session\Exceptions\GeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Models\RefreshTokenModel;
 

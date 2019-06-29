@@ -5,9 +5,9 @@ namespace SuperTokens\Session;
 use Exception;
 use DateTime;
 use Illuminate\Support\Facades\Config;
-use SuperTokens\Session\Exceptions\GeneralException;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
-use SuperTokens\Session\Exceptions\UnauthorizedException;
+use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
+use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 
@@ -16,7 +16,7 @@ class RefreshToken {
     /**
      * @param $token
      * @return array
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
     public static function getInfoFromRefreshToken($token) {
 
@@ -46,7 +46,7 @@ class RefreshToken {
                 'parentRefreshTokenHash1' => $parentRefreshTokenHash1,
             ];
         } catch (Exception $e) {
-            throw new UnauthorizedException($e->getMessage());
+            throw SuperTokensException::generateUnauthorisedException($e);
         }
     }
 
@@ -55,7 +55,7 @@ class RefreshToken {
      * @param $userId
      * @param $parentRefreshTokenHash1
      * @return array
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensException
      */
     public static function createNewRefreshToken($sessionHandle, $userId, $parentRefreshTokenHash1) {
 
@@ -79,7 +79,7 @@ class RefreshToken {
                 'expiry' => $expiry
             ];
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw new SuperTokensGeneralException($e->getMessage());
         }
     }
 

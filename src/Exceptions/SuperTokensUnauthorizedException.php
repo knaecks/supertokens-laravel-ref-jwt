@@ -3,17 +3,16 @@
 namespace SuperTokens\Session\Exceptions;
 
 /**
- * Class UnauthorizedException
+ * Class SuperTokensUnauthorizedException
  * @package SuperTokens\Laravel\Exceptions
  */
-class UnauthorizedException extends SuperTokensAuthException {
+class SuperTokensUnauthorizedException extends SuperTokensException {
 
     /**
-     * UnauthorizedException constructor.
+     * SuperTokensUnauthorizedException constructor.
      * @param string $message
      */
     public function __construct($message = "") {
-        $code = 2000;
-        parent::__construct($message, $code);
+        parent::__construct($message);
     }
 }

@@ -4,17 +4,16 @@ namespace SuperTokens\Session\Exceptions;
 use Exception;
 
 /**
- * Class TryRefreshTokenException
+ * Class SuperTokensTryRefreshTokenException
  * @package SuperTokens\Laravel\Exceptions
  */
-class TryRefreshTokenException extends SuperTokensAuthException {
+class SuperTokensTryRefreshTokenException extends SuperTokensException {
 
     /**
-     * TryRefreshTokenException constructor.
+     * SuperTokensTryRefreshTokenException constructor.
      * @param string $message
      */
     public function __construct($message = "") {
-        $code = 3000;
-        parent::__construct($message, $code);
+        parent::__construct($message);
     }
 }

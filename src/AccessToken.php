@@ -6,9 +6,9 @@ use DateTime;
 use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
-use SuperTokens\Session\Exceptions\GeneralException;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
-use SuperTokens\Session\Exceptions\TryRefreshTokenException;
+use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
+use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Helpers\Jwt;
 use SuperTokens\Session\Helpers\AccessTokenSigningKey;
@@ -19,7 +19,7 @@ class AccessToken {
      * @param $token
      * @param bool $retry
      * @return array
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensTryRefreshTokenException | SuperTokensGeneralException
      */
     public static function getInfoFromAccessToken($token, $retry = true) {
 
@@ -45,12 +45,12 @@ class AccessToken {
             if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime)) {
                 // it would come here if we change the structure of the JWT.
                 // throw error
-                throw new SuperTokensAuthException("invalid access token payload");
+                throw new Exception("invalid access token payload");
             }
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
             if ($expiryTime < $currentTimestamp) {
-                throw new SuperTokensAuthException("expired access token");
+                throw new Exception("expired access token");
             }
 
             return [
@@ -62,7 +62,7 @@ class AccessToken {
                 'userPayload' => $userPayload,
             ];
         } catch (Exception $e) {
-            throw new TryRefreshTokenException($e->getMessage());
+            throw SuperTokensException::generateTryRefreshTokenException($e);
         }
     }
 
@@ -73,7 +73,7 @@ class AccessToken {
      * @param $parentRefreshTokenHash1
      * @param $userPayload
      * @return array
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensException
      */
     public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload) {
 
@@ -97,7 +97,7 @@ class AccessToken {
                 'expiry' => $expiry
             ];
         } catch (Exception $e) {
-            throw new GeneralException($e->getMessage());
+            throw new SuperTokensGeneralException($e->getMessage());
         }
     }
 }

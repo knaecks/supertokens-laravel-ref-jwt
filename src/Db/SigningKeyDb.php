@@ -3,6 +3,8 @@
 namespace SuperTokens\Session\Db;
 
 use Exception;
+use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Models\SigningKeyModel;
 
 class SigningKeyDb {
@@ -15,7 +17,7 @@ class SigningKeyDb {
     public static function getKeyValueFromKeyName($keyName) {
         // check for transaction
         try {
-            $result= SigningKeyModel::where('key_name', '=', $keyName)->lockForUpdate()->first();
+            $result = SigningKeyModel::where('key_name', '=', $keyName)->lockForUpdate()->first();
             if ($result === null) {
                 return null;
             }
@@ -24,7 +26,7 @@ class SigningKeyDb {
                 'createdAtTime' => $result->created_at_time
             ];
         } catch (Exception $e) {
-            throw $e;
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 
@@ -36,25 +38,24 @@ class SigningKeyDb {
      */
     public static function insertKeyValueForKeyName($keyName, $keyValue, $createdAtTime) {
         try {
-            $signingKey = new SigningKeyModel;
-            $signingKey->updateOrInsert(
+            SigningKeyModel::updateOrInsert(
                 ['key_name' => $keyName],
                 ['key_name' => $keyName, 'key_value' => $keyValue, 'created_at_time' => $createdAtTime]
             );
         } catch (Exception $e) {
-            throw $e;
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 
     /**
      * @param $keyName
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     public static function removeKeyValueForKeyName($keyName) {
         try {
             SigningKeyModel::where('key_name', '=', $keyName)->delete();
         } catch (Exception $e) {
-            throw $e;
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 }
