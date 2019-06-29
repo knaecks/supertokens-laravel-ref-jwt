@@ -73,7 +73,7 @@ class AccessToken {
      * @param $parentRefreshTokenHash1
      * @param $userPayload
      * @return array
-     * @throws SuperTokensException
+     * @throws SuperTokensGeneralException
      */
     public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload) {
 
@@ -97,7 +97,7 @@ class AccessToken {
                 'expiry' => $expiry
             ];
         } catch (Exception $e) {
-            throw new SuperTokensGeneralException($e->getMessage());
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 }

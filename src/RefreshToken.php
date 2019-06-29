@@ -55,7 +55,7 @@ class RefreshToken {
      * @param $userId
      * @param $parentRefreshTokenHash1
      * @return array
-     * @throws SuperTokensException
+     * @throws SuperTokensGeneralException
      */
     public static function createNewRefreshToken($sessionHandle, $userId, $parentRefreshTokenHash1) {
 
@@ -79,7 +79,7 @@ class RefreshToken {
                 'expiry' => $expiry
             ];
         } catch (Exception $e) {
-            throw new SuperTokensGeneralException($e->getMessage());
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 
