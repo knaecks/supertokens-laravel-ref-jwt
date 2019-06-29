@@ -114,8 +114,10 @@ class AccessTokenSigningKey {
      * @throws SuperTokensGeneralException
      */
     private function maybeGenerateNewKeyAndUpdateInDb() {
+        $transactionStarted = false;
         try {
             DB::beginTransaction();
+            $transactionStarted = true;
             $key = SigningKeyDb::getKeyValueFromKeyNameForUpdate(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
             $generateNewKey = false;
 
@@ -139,7 +141,9 @@ class AccessTokenSigningKey {
             DB::commit();
             return $key;
         } catch (Exception $e) {
-            DB::rollBack();
+            if ($transactionStarted) {
+                DB::rollBack();
+            }
             throw SuperTokensException::generateGeneralException($e);
         }
     }

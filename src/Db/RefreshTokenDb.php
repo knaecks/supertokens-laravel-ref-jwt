@@ -126,10 +126,11 @@ class RefreshTokenDb {
     /**
      * @param $sessionHandle
      * @throws SuperTokensGeneralException
+     * @return number
      */
     public static function deleteSession($sessionHandle) {
         try {
-            RefreshTokenModel::where('session_handle', '=', $sessionHandle)->delete();
+            return RefreshTokenModel::where('session_handle', '=', $sessionHandle)->delete();
         } catch (Exception $e) {
             throw SuperTokensException::generateGeneralException($e);
         }

@@ -35,7 +35,7 @@ class Session {
      * @param $jwtPayload
      * @param $sessionData
      * @return array
-     * @throws SuperTokensException | Exception
+     * @throws SuperTokensGeneralException
      */
     public static function createNewSession($userId, $jwtPayload, $sessionData) {
         $sessionHandle = Utils::generateSessionHandle();
@@ -83,10 +83,10 @@ class Session {
 
         $blacklisting = Config::get('supertokens.tokens.accessToken.blacklisting');
 
-        if (isset($blacklisting) && $blacklisting) {
+        if (isset($blacklisting) && $blacklisting === true) {
             $isBlacklisted = RefreshTokenDb::isSessionBlacklisted($sessionHandle);
             if ($isBlacklisted) {
-                throw new SuperTokensUnauthorizedException("session is over or has been blacklisted");
+                throw SuperTokensException::generateUnauthorisedException("session is over or has been blacklisted");
             }
         }
 
@@ -100,12 +100,14 @@ class Session {
             ];
         }
 
+        $transactionStarted = false;
         try {
             DB::beginTransaction();
+            $transactionStarted = true;
             $sessionInfo = RefreshTokenDb::getSessionInfoForUpdate($sessionHandle);
             if (!isset($sessionInfo)) {
                 DB::commit();
-                throw new SuperTokensUnauthorizedException("missing session in db");
+                throw SuperTokensException::generateUnauthorisedException("missing session in db");
             }
 
             $promote = $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['parentRefreshTokenHash1']);
@@ -145,10 +147,12 @@ class Session {
             }
 
             DB::commit();
-            throw new SuperTokensUnauthorizedException("using access token whose refresh token is no more.");
+            throw SuperTokensException::generateUnauthorisedException("using access token whose refresh token is no more.");
         } catch(Exception $e) {
-            DB::rollBack();
-            throw $e;
+            if ($transactionStarted) {
+                DB::rollBack();
+            }
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 
@@ -166,24 +170,26 @@ class Session {
      * @param $refreshToken
      * @param $refreshTokenInfo
      * @return array
-     * @throws Exception
+     * @throws SuperTokensGeneralException | SuperTokensUnauthorizedException
      */
     public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
-        DB::beginTransaction();
+        $transactionStarted = false;
         try {
+            DB::beginTransaction();
+            $transactionStarted = true;
 
             $sessionInfo = RefreshTokenDb::getSessionInfoForUpdate($sessionHandle);
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
             if (!isset($sessionInfo) || $sessionInfo['expiresAt'] < $currentTimestamp) {
                 DB::commit();
-                throw new SuperTokensUnauthorizedException("session does not exist or has expired");
+                throw SuperTokensException::generateUnauthorisedException("session does not exist or has expired");
             }
 
             if ($sessionInfo['userId'] !== $refreshTokenInfo['userId']) {
                 DB::commit();
-                throw new SuperTokensUnauthorizedException("userId for session does not match the userId in the refresh token");
+                throw SuperTokensException::generateUnauthorisedException("userId for session does not match the userId in the refresh token");
             }
 
             if ($sessionInfo['refreshTokenHash2'] === Utils::hashString(Utils::hashString($refreshToken))) {
@@ -247,16 +253,18 @@ class Session {
             }
 
             DB::commit();
-            throw new SuperTokensUnauthorizedException("token theft detected!");
+            throw SuperTokensException::generateUnauthorisedException("token theft detected!");
         } catch (Exception $e) {
-            DB::rollBack();
-            throw $e;
+            if ($transactionStarted) {
+                DB::rollBack();
+            }
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 
     /**
      * @param $userId
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     public static function revokeAllSessionsForUser($userId) {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
@@ -268,31 +276,31 @@ class Session {
     /**
      * @param $userId
      * @return array
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     public static function getAllSessionHandlesForUser($userId) {
-        $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
-        return $sessionHandles;
+        return RefreshTokenDb::getAllSessionHandlesForUser($userId);
     }
 
     /**
      * @param $sessionHandle
-     * @throws Exception
+     * @return bool
+     * @throws SuperTokensGeneralException
      */
     public static function revokeSessionUsingSessionHandle($sessionHandle) {
-        RefreshTokenDb::deleteSession($sessionHandle);
+        return RefreshTokenDb::deleteSession($sessionHandle) === 1;
     }
 
     /**
      * @param $sessionHandle
      * @return mixed
      * @throws Exception
-     * @throws SuperTokensUnauthorizedException
+     * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
     public static function getSessionData($sessionHandle) {
         $result = RefreshTokenDb::getSessionData($sessionHandle);
         if (!$result['found']) {
-            throw new SuperTokensUnauthorizedException("session does not exist anymore");
+            throw SuperTokensException::generateUnauthorisedException("session does not exist anymore");
         }
         return $result['data'];
     }
@@ -300,12 +308,12 @@ class Session {
     /**
      * @param $sessionHandle
      * @param $newSessionData
-     * @throws SuperTokensException | Exception
+     * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
     public static function updateSessionData($sessionHandle, $newSessionData) {
         $affected = RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
         if ($affected !== 1) {
-            throw new SuperTokensUnauthorizedException("session does not exist anymore");
+            throw SuperTokensException::generateUnauthorisedException("session does not exist anymore");
         }
     }
 }
