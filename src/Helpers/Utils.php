@@ -155,11 +155,11 @@ class Utils {
 
     /**
      * @param $data
-     * @return mixed|void
+     * @return mixed|null
      */
     public static function unserializeData($data) {
         if ($data === "") {
-            return;
+            return null;
         }
         return json_decode($data, true);
     }

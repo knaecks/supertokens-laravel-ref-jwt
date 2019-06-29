@@ -116,7 +116,7 @@ class AccessTokenSigningKey {
     private function maybeGenerateNewKeyAndUpdateInDb() {
         try {
             DB::beginTransaction();
-            $key = SigningKeyDb::getKeyValueFromKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
+            $key = SigningKeyDb::getKeyValueFromKeyNameForUpdate(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
             $generateNewKey = false;
 
             if ($key !== null) {
@@ -133,7 +133,7 @@ class AccessTokenSigningKey {
                     'keyValue' => $keyValue,
                     'createdAtTime' => $currentTime
                 ];
-                SigningKeyDb::insertKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB, $keyValue, $currentTime);
+                SigningKeyDb::insertKeyValueForKeyName_Transaction(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB, $keyValue, $currentTime);
             }
 
             DB::commit();

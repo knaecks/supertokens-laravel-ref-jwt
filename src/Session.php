@@ -102,7 +102,7 @@ class Session {
 
         try {
             DB::beginTransaction();
-            $sessionInfo = RefreshTokenDb::getSessionInfo($sessionHandle);
+            $sessionInfo = RefreshTokenDb::getSessionInfoForUpdate($sessionHandle);
             if (!isset($sessionInfo)) {
                 DB::commit();
                 throw new SuperTokensUnauthorizedException("missing session in db");
@@ -116,7 +116,7 @@ class Session {
                     $date = new DateTime();
                     $currentTimestamp = $date->getTimestamp();
                     $expiresAt = $currentTimestamp + ($validity * 60 * 60);
-                    RefreshTokenDb::updateSessionInfo(
+                    RefreshTokenDb::updateSessionInfo_Transaction(
                         $sessionHandle,
                         Utils::hashString($accessTokenInfo['refreshTokenHash1']),
                         $sessionInfo['sessionData'],
@@ -173,7 +173,7 @@ class Session {
         DB::beginTransaction();
         try {
 
-            $sessionInfo = RefreshTokenDb::getSessionInfo($sessionHandle);
+            $sessionInfo = RefreshTokenDb::getSessionInfoForUpdate($sessionHandle);
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
             if (!isset($sessionInfo) || $sessionInfo['expiresAt'] < $currentTimestamp) {
@@ -235,7 +235,7 @@ class Session {
                 $date = new DateTime();
                 $currentTimestamp = $date->getTimestamp();
                 $expiresAt = $currentTimestamp + ($validity * 60 * 60);
-                RefreshTokenDb::updateSessionInfo(
+                RefreshTokenDb::updateSessionInfo_Transaction(
                     $sessionHandle,
                     Utils::hashString(Utils::hashString($refreshToken)),
                     $sessionInfo['sessionData'],
@@ -303,8 +303,8 @@ class Session {
      * @throws SuperTokensException | Exception
      */
     public static function updateSessionData($sessionHandle, $newSessionData) {
-        $result = RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
-        if (!$result) {
+        $affected = RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
+        if ($affected !== 1) {
             throw new SuperTokensUnauthorizedException("session does not exist anymore");
         }
     }

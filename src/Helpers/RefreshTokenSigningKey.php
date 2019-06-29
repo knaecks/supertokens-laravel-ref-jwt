@@ -67,7 +67,7 @@ class RefreshTokenSigningKey {
     private function generateNewKeyAndUpdateInDb() {
         try {
             DB::beginTransaction();
-            $key = SigningKeyDb::getKeyValueFromKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
+            $key = SigningKeyDb::getKeyValueFromKeyNameForUpdate(REFRESH_TOKEN_KEY_NAME_IN_DB);
             if ($key === null) {
                 $keyValue = Utils::generateNewSigningKey();
                 $currentTime = Utils::getDateTimeStamp();
@@ -75,7 +75,7 @@ class RefreshTokenSigningKey {
                     'keyValue' => $keyValue,
                     'createdAtTime' => $currentTime
                 ];
-                SigningKeyDb::insertKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB, $keyValue, $currentTime);
+                SigningKeyDb::insertKeyValueForKeyName_Transaction(REFRESH_TOKEN_KEY_NAME_IN_DB, $keyValue, $currentTime);
             }
             DB::commit();
             return $key['keyValue'];

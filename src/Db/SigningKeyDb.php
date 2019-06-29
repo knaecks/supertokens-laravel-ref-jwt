@@ -12,9 +12,9 @@ class SigningKeyDb {
     /**
      * @param $keyName
      * @return array|null
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
-    public static function getKeyValueFromKeyName($keyName) {
+    public static function getKeyValueFromKeyNameForUpdate($keyName) {
         // check for transaction
         try {
             $result = SigningKeyModel::where('key_name', '=', $keyName)->lockForUpdate()->first();
@@ -34,9 +34,9 @@ class SigningKeyDb {
      * @param $keyName
      * @param $keyValue
      * @param $createdAtTime
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
-    public static function insertKeyValueForKeyName($keyName, $keyValue, $createdAtTime) {
+    public static function insertKeyValueForKeyName_Transaction($keyName, $keyValue, $createdAtTime) {
         try {
             SigningKeyModel::updateOrInsert(
                 ['key_name' => $keyName],
