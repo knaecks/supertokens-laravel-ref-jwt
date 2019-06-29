@@ -94,7 +94,7 @@ class Utils {
 
     /**
      * @param $field
-     * @return string|void
+     * @return string|null
      */
     public static function sanitizeStringInput($field) {
         if ($field === "") {
@@ -102,7 +102,7 @@ class Utils {
         }
 
         if (gettype($field) !== "string") {
-            return;
+            return null;
         }
 
         return trim($field);
@@ -110,7 +110,7 @@ class Utils {
 
     /**
      * @param $field
-     * @return string|void
+     * @return string|null
      */
     public static function sanitizeNumberInput($field) {
         $type = gettype($field);
@@ -119,7 +119,7 @@ class Utils {
         }
 
         if ($type !== "string") {
-            return;
+            return null;
         }
 
         return number_format(trim($field));
@@ -127,7 +127,7 @@ class Utils {
 
     /**
      * @param $field
-     * @return bool|void
+     * @return bool|null
      */
     public static function sanitizeBooleanInput($field) {
         if ($field === true || $field === false) {
@@ -139,7 +139,7 @@ class Utils {
         if ($field === "true") {
             return true;
         }
-        return;
+        return null;
     }
 
     /**
