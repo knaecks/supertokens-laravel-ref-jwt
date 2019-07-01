@@ -503,7 +503,6 @@ class SessionTest extends TestCase {
     public function testUpdateSessionInfo() {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
-        Config::set('supertokens.tokens.accessToken.blacklisting', true);
         new Session();
 
         $userId = "testing";
@@ -528,5 +527,111 @@ class SessionTest extends TestCase {
 
         $sessionDataPostUpdate = Session::getSessionData($newSession['session']['handle']);
         $this->assertEquals($sessionDataPostUpdate, $newSessionData);
+    }
+
+    /**
+     * @throws SuperTokensAuthException | Exception
+     */
+    public function testRevokeSessionWithoutBlacklisting() {
+        RefreshTokenSigningKey::resetInstance();
+        AccessTokenSigningKey::resetInstance();
+        new Session();
+
+        $userId = "testing";
+        $jwtPayload = [
+            "a" => "testing"
+        ];
+        $sessionData = [
+            "s" => "session"
+        ];
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $this->assertIsArray($newSession);
+        $this->assertIsArray($newSession['session']);
+        $this->assertArrayHasKey("handle", $newSession['session']);
+        $this->assertIsString($newSession['session']['handle']);
+
+        $noOfRows = RefreshTokenModel::all()->count();
+        $this->assertEquals($noOfRows, 2);
+
+        Session::revokeSessionUsingSessionHandle($newSession['session']['handle']);
+        $noOfRows = RefreshTokenModel::all()->count();
+        $this->assertEquals($noOfRows, 1);
+
+        try {
+            Session::refreshSession($newSession['refreshToken']['value']);
+            throw new Exception("test failed");
+        } catch (SuperTokensAuthException $e) {
+            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+        }
+
+        $sessionInfo = Session::getSession($newSession['accessToken']['value']);
+        $this->assertIsArray($sessionInfo);
+        $this->assertArrayNotHasKey("newAccessToken", $sessionInfo);
+        $this->assertArrayHasKey("session", $sessionInfo);
+        $this->assertArrayHasKey("handle", $sessionInfo['session']);
+        $this->assertArrayHasKey("userId", $sessionInfo['session']);
+        $this->assertArrayHasKey("jwtPayload", $sessionInfo['session']);
+        $this->assertIsString($sessionInfo['session']['handle']);
+        $this->assertEquals($sessionInfo['session']['userId'], $userId);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
+    }
+
+    /**
+     * @throws SuperTokensAuthException | Exception
+     */
+    public function testRevokeSessionWithBlacklisting() {
+        RefreshTokenSigningKey::resetInstance();
+        AccessTokenSigningKey::resetInstance();
+        Config::set('supertokens.tokens.accessToken.blacklisting', true);
+        new Session();
+
+        $userId = "testing";
+        $jwtPayload = [
+            "a" => "testing"
+        ];
+        $sessionData = [
+            "s" => "session"
+        ];
+
+        $newSession1 = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $newSession2 = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $this->assertIsArray($newSession1);
+        $this->assertIsArray($newSession1['session']);
+        $this->assertArrayHasKey("handle", $newSession1['session']);
+        $this->assertIsString($newSession1['session']['handle']);
+
+        $noOfRows = RefreshTokenModel::all()->count();
+        $this->assertEquals($noOfRows, 2);
+
+        Session::revokeSessionUsingSessionHandle($newSession1['session']['handle']);
+        $noOfRows = RefreshTokenModel::all()->count();
+        $this->assertEquals($noOfRows, 1);
+
+        try {
+            Session::refreshSession($newSession1['refreshToken']['value']);
+            throw new Exception("test failed");
+        } catch (SuperTokensAuthException $e) {
+            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+        }
+
+        try {
+            Session::getSession($newSession1['accessToken']['value']);
+            throw new Exception("test failed");
+        } catch (SuperTokensAuthException $e) {
+            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+        }
+
+        $sessionInfo = Session::getSession($newSession2['accessToken']['value']);
+        $this->assertIsArray($sessionInfo);
+        $this->assertArrayNotHasKey("newAccessToken", $sessionInfo);
+        $this->assertArrayHasKey("session", $sessionInfo);
+        $this->assertArrayHasKey("handle", $sessionInfo['session']);
+        $this->assertArrayHasKey("userId", $sessionInfo['session']);
+        $this->assertArrayHasKey("jwtPayload", $sessionInfo['session']);
+        $this->assertIsString($sessionInfo['session']['handle']);
+        $this->assertEquals($sessionInfo['session']['userId'], $userId);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
     }
 }

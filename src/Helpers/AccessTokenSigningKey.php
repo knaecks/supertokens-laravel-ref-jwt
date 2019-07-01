@@ -82,6 +82,7 @@ class AccessTokenSigningKey {
 
             $currentTime = Utils::getDateTimeStamp();
 
+
             if ($this->isDynamic && $currentTime > ($this->createdAtTime + $this->updateInterval)) {
                 // key has expired, we need to change it.
                 $this->signingKey = $this->maybeGenerateNewKeyAndUpdateInDb();
@@ -111,7 +112,7 @@ class AccessTokenSigningKey {
      */
     private function maybeGenerateNewKeyAndUpdateInDb() {
         DB::beginTransaction();
-
+        $rollback = true;
         try {
             $key = SigningKeyDb::getKeyValueFromKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
             $generateNewKey = false;
@@ -131,13 +132,16 @@ class AccessTokenSigningKey {
                     'createdAtTime' => $currentTime
                 ];
                 SigningKeyDb::insertKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB, $keyValue, $currentTime);
-                $this->createdAtTime = $currentTime;
             }
 
+            $this->createdAtTime = $key['createdAtTime'];
+            $rollback = false;
             DB::commit();
             return $key['keyValue'];
         } catch (Exception $e) {
-            DB::rollBack();
+            if ($rollback) {
+                DB::rollBack();
+            }
             throw $e;
         }
     }

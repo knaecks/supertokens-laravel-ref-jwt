@@ -99,10 +99,12 @@ class Session {
         }
 
         DB::beginTransaction();
+        $rollback = true;
         try {
 
             $sessionInfo = RefreshTokenDb::getSessionInfo($sessionHandle);
             if (!isset($sessionInfo)) {
+                $rollback = false;
                 DB::commit();
                 throw new UnauthorizedException("missing session in db");
             }
@@ -122,6 +124,7 @@ class Session {
                         $expiresAt
                     );
                 }
+                $rollback = false;
                 DB::commit();
                 $newAccessToken = AccessToken::createNewAccessToken(
                     $sessionHandle,
@@ -143,10 +146,13 @@ class Session {
                 ];
             }
 
+            $rollback = false;
             DB::commit();
             throw new UnauthorizedException("using access token whose refresh token is no more.");
         } catch(Exception $e) {
-            DB::rollBack();
+            if ($rollback) {
+                DB::rollBack();
+            }
             throw $e;
         }
     }
@@ -170,22 +176,26 @@ class Session {
     public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
         DB::beginTransaction();
+        $rollback = true;
         try {
 
             $sessionInfo = RefreshTokenDb::getSessionInfo($sessionHandle);
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
             if (!isset($sessionInfo) || $sessionInfo['expiresAt'] < $currentTimestamp) {
+                $rollback = false;
                 DB::commit();
                 throw new UnauthorizedException("session does not exist or has expired");
             }
 
             if ($sessionInfo['userId'] !== $refreshTokenInfo['userId']) {
+                $rollback = false;
                 DB::commit();
                 throw new UnauthorizedException("userId for session does not match the userId in the refresh token");
             }
 
             if ($sessionInfo['refreshTokenHash2'] === Utils::hashString(Utils::hashString($refreshToken))) {
+                $rollback = false;
                 DB::commit();
                 $newRefreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $refreshTokenInfo['userId'], Utils::hashString($refreshToken));
                 $newAccessToken = AccessToken::createNewAccessToken(
@@ -240,15 +250,19 @@ class Session {
                     $sessionInfo['sessionData'],
                     $expiresAt
                 );
+                $rollback = false;
                 DB::commit();
                 // now we can generate children tokens for the current input token.
                 return Session::refreshSessionHelper($refreshToken, $refreshTokenInfo);
             }
 
+            $rollback = false;
             DB::commit();
             throw new UnauthorizedException("token theft detected!");
         } catch (Exception $e) {
-            DB::rollBack();
+            if ($rollback) {
+                DB::rollBack();
+            }
             throw $e;
         }
     }

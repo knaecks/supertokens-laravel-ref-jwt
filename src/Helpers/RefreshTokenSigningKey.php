@@ -66,7 +66,7 @@ class RefreshTokenSigningKey {
      */
     private function generateNewKeyAndUpdateInDb() {
         DB::beginTransaction();
-
+        $rollback = true;
         try {
             $key = SigningKeyDb::getKeyValueFromKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
             if ($key === null) {
@@ -78,10 +78,13 @@ class RefreshTokenSigningKey {
                 ];
                 SigningKeyDb::insertKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB, $keyValue, $currentTime);
             }
+            $rollback = false;
             DB::commit();
             return $key['keyValue'];
         } catch (Exception $e) {
-            DB::rollBack();
+            if ($rollback) {
+                DB::rollBack();
+            }
             throw $e;
         }
     }
