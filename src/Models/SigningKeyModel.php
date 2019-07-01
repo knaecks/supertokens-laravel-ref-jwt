@@ -13,4 +13,6 @@ class SigningKeyModel extends Model {
     protected $table = "signing_key";
 
     protected $fillable = ['key_name', 'key_value', 'created_at_time'];
+
+    public $timestamps = false;
 }

@@ -3,6 +3,7 @@
 namespace SuperTokens\Session\Db;
 
 use Exception;
+use Illuminate\Support\Facades\App;
 use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Models\SigningKeyModel;
@@ -52,10 +53,12 @@ class SigningKeyDb {
      * @throws SuperTokensGeneralException
      */
     public static function removeKeyValueForKeyName($keyName) {
-        try {
-            SigningKeyModel::where('key_name', '=', $keyName)->delete();
-        } catch (Exception $e) {
-            throw SuperTokensException::generateGeneralException($e);
+        if (App::environment("testing")) {
+            try {
+                SigningKeyModel::where('key_name', '=', $keyName)->delete();
+            } catch (Exception $e) {
+                throw SuperTokensException::generateGeneralException($e);
+            }
         }
     }
 }

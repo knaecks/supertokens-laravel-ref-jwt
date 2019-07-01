@@ -3,6 +3,7 @@
 namespace SuperTokens\Session\Helpers;
 
 use Exception;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Session\Db\SigningKeyDb;
@@ -170,7 +171,9 @@ class AccessTokenSigningKey {
      * @throws SuperTokensGeneralException
      */
     public static function resetInstance() {
-        SigningKeyDb::removeKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
-        AccessTokenSigningKey::$instance = null;
+        if (App::environment("testing")) {
+            SigningKeyDb::removeKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
+            AccessTokenSigningKey::$instance = null;
+        }
     }
 }

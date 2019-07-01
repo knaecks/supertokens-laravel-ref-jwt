@@ -39,4 +39,8 @@ abstract class SuperTokensException extends Exception {
         return new SuperTokensTryRefreshTokenException($anything);
     }
 
+    public static function generateTokenTheftException($userId, $sessionHandle) {
+        return new SuperTokensTokenTheftException($userId, $sessionHandle);
+    }
+
 }

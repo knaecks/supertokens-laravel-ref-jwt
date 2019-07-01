@@ -18,7 +18,6 @@ class CreateSigningKeyTable extends Migration
             $table->string('key_name', 128)->primary();
             $table->string('key_value', 255);
             $table->bigInteger('created_at_time')->unsigned();
-            $table->timestamps();
         });
     }
     /**

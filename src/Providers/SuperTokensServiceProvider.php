@@ -2,7 +2,11 @@
 
 namespace SuperTokens\Session\Providers;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
+use SuperTokens\Session\Helpers\Utils;
+use SuperTokens\Session\Models\RefreshTokenModel;
 use SuperTokens\Session\Session;
 
 class SuperTokensServiceProvider extends ServiceProvider {
@@ -22,6 +26,7 @@ class SuperTokensServiceProvider extends ServiceProvider {
     public function boot() {
         $this->registerResources();
         $this->registerPublishing();
+        $this->registerScheduler();
     }
 
     private function registerResources() {
@@ -38,6 +43,16 @@ class SuperTokensServiceProvider extends ServiceProvider {
     private function registerFacades() {
         $this->app->singleton("SuperTokens", function ($app) {
             return new Session();
+        });
+    }
+
+    private function registerScheduler() {
+        $this->app->booted(function () {
+            $schedule = app(Schedule::class);
+            $schedule->call(function () {
+                $currentTimestamp = Utils::getDateTimeStamp();
+                RefreshTokenModel::where('expires_at', '<=', $currentTimestamp)->delete();
+            })->cron(Config::get('supertokens.tokens.refreshToken.removalCronjobInterval'));
         });
     }
 }

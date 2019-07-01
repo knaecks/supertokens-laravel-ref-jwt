@@ -14,6 +14,11 @@ use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 class RefreshToken {
 
     /**
+     * @var int
+     */
+    private static $validity;
+
+    /**
      * @param $token
      * @return array
      * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
@@ -70,10 +75,10 @@ class RefreshToken {
             ]);
             $encryptedPart = Utils::encrypt($payloadSerialised, $key); //encrypt $payloadSerialised with $key
             $token = $encryptedPart.'.'.$nonce;
-            $validity = Config::get('supertokens.tokens.refreshToken.validity');
+            $validity = RefreshToken::getValidity();
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
-            $expiry = $currentTimestamp + ($validity * 60 * 60);
+            $expiry = $currentTimestamp + $validity;
             return [
                 'token' => $token,
                 'expiry' => $expiry
@@ -83,4 +88,10 @@ class RefreshToken {
         }
     }
 
+    public static function getValidity() {
+        if (!isset(RefreshToken::$validity)) {
+            RefreshToken::$validity = Config::get('supertokens.tokens.refreshToken.validity') * 60 * 60;
+        }
+        return RefreshToken::$validity;
+    }
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensTokenTheftException;
 use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\Utils;
@@ -115,10 +116,10 @@ class Session {
             if ($promote || $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['refreshTokenHash1'])) {
 
                 if ($promote) {
-                    $validity = Config::get('supertokens.tokens.refreshToken.validity');
+                    $validity = RefreshToken::getValidity();
                     $date = new DateTime();
                     $currentTimestamp = $date->getTimestamp();
-                    $expiresAt = $currentTimestamp + ($validity * 60 * 60);
+                    $expiresAt = $currentTimestamp + $validity;
                     RefreshTokenDb::updateSessionInfo_Transaction(
                         $sessionHandle,
                         Utils::hashString($accessTokenInfo['refreshTokenHash1']),
@@ -243,10 +244,10 @@ class Session {
                 // result in refresh tokens living on for a longer period of time than what is expected. But that is OK, since they keep changing
                 // based on access token's expiry anyways.
                 // This can be solved fairly easily by keeping the expiry time in the refresh token payload as well.
-                $validity = Config::get('supertokens.tokens.refreshToken.validity');
+                $validity = RefreshToken::getValidity();
                 $date = new DateTime();
                 $currentTimestamp = $date->getTimestamp();
-                $expiresAt = $currentTimestamp + ($validity * 60 * 60);
+                $expiresAt = $currentTimestamp + $validity;
                 RefreshTokenDb::updateSessionInfo_Transaction(
                     $sessionHandle,
                     Utils::hashString(Utils::hashString($refreshToken)),
@@ -261,7 +262,7 @@ class Session {
 
             DB::commit();
             $rollback = false;
-            throw SuperTokensException::generateUnauthorisedException("token theft detected!");
+            throw SuperTokensException::generateTokenTheftException($sessionInfo['userId'], $sessionHandle);
         } catch (Exception $e) {
             if ($rollback) {
                 DB::rollBack();

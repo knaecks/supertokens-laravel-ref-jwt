@@ -3,6 +3,7 @@
 namespace SuperTokens\Session\Helpers;
 
 use Exception;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Session\Db\SigningKeyDb;
 use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
@@ -94,7 +95,9 @@ class RefreshTokenSigningKey {
      * @throws SuperTokensGeneralException
      */
     public static function resetInstance() {
-        SigningKeyDb::removeKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
-        RefreshTokenSigningKey::$instance = null;
+        if (App::environment("testing")) {
+            SigningKeyDb::removeKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
+            RefreshTokenSigningKey::$instance = null;
+        }
     }
 }
