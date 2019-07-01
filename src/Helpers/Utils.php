@@ -5,6 +5,8 @@ namespace SuperTokens\Session\Helpers;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
+use SuperTokens\Session\Exceptions\SuperTokensException;
+use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 
 class Utils {
 
@@ -60,10 +62,14 @@ class Utils {
 
     /**
      * @return string
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     public static function generateUUID() {
-        return Uuid::uuid1()->toString();
+        try {
+            return Uuid::uuid1()->toString();
+        } catch (Exception $e) {
+            throw SuperTokensException::generateGeneralException($e);
+        }
     }
 
     /**
@@ -86,7 +92,7 @@ class Utils {
 
     /**
      * @return string
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     public static function generateSessionHandle() {
         return Utils::generateUUID();
@@ -94,7 +100,7 @@ class Utils {
 
     /**
      * @param $field
-     * @return string|void
+     * @return string|null
      */
     public static function sanitizeStringInput($field) {
         if ($field === "") {
@@ -102,7 +108,7 @@ class Utils {
         }
 
         if (gettype($field) !== "string") {
-            return;
+            return null;
         }
 
         return trim($field);
@@ -110,7 +116,7 @@ class Utils {
 
     /**
      * @param $field
-     * @return string|void
+     * @return string|null
      */
     public static function sanitizeNumberInput($field) {
         $type = gettype($field);
@@ -119,7 +125,7 @@ class Utils {
         }
 
         if ($type !== "string") {
-            return;
+            return null;
         }
 
         return number_format(trim($field));
@@ -127,7 +133,7 @@ class Utils {
 
     /**
      * @param $field
-     * @return bool|void
+     * @return bool|null
      */
     public static function sanitizeBooleanInput($field) {
         if ($field === true || $field === false) {
@@ -139,7 +145,7 @@ class Utils {
         if ($field === "true") {
             return true;
         }
-        return;
+        return null;
     }
 
     /**
@@ -155,20 +161,24 @@ class Utils {
 
     /**
      * @param $data
-     * @return mixed|void
+     * @return mixed|null
      */
     public static function unserializeData($data) {
         if ($data === "") {
-            return;
+            return null;
         }
         return json_decode($data, true);
     }
 
     /**
      * @return int
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     public static function getDateTimeStamp() {
-        return (new DateTime())->getTimestamp();
+        try {
+            return (new DateTime())->getTimestamp();
+        } catch (Exception $e) {
+            throw SuperTokensException::generateGeneralException($e);
+        }
     }
 }

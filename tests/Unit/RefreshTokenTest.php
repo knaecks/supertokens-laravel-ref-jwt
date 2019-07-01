@@ -2,18 +2,20 @@
 
 namespace SuperTokens\Session\Tests;
 
+use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
+use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 use SuperTokens\Session\Session;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Exception;
 use SuperTokens\Session\RefreshToken;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
 
 class RefreshTokenTest extends TestCase {
     use RefreshDatabase;
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testCreateAndVerifyRefreshTokenSameSigningKey() {
         RefreshTokenSigningKey::resetInstance();
@@ -34,7 +36,7 @@ class RefreshTokenTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testCreateAndVerifyRefreshTokenDifferentSigningKey() {
         RefreshTokenSigningKey::resetInstance();
@@ -51,8 +53,10 @@ class RefreshTokenTest extends TestCase {
         try {
             RefreshToken::getInfoFromRefreshToken($token['token']);
             throw new Exception("test failed");
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+        } catch (SuperTokensUnauthorizedException $e) {
+            $this->assertTrue(true);
+        } catch (Exception $e) {
+            throw new Exception("test failed");
         }
     }
 }

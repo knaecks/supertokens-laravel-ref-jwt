@@ -5,8 +5,8 @@ namespace SuperTokens\Session\Helpers;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Session\Db\SigningKeyDb;
-use SuperTokens\Session\Exceptions\GeneralException;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
 
 define("REFRESH_TOKEN_KEY_NAME_IN_DB", "refresh_token_key");
 
@@ -28,7 +28,7 @@ class RefreshTokenSigningKey {
     private function __construct() {}
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensGeneralException
      */
     public static function init() {
         if (!isset(RefreshTokenSigningKey::$instance)) {
@@ -39,11 +39,11 @@ class RefreshTokenSigningKey {
 
     /**
      * @return string
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensGeneralException
      */
     public static function getKey() {
         if (!isset(RefreshTokenSigningKey::$instance)) {
-            throw new GeneralException('please call init function of refresh token key');
+            throw SuperTokensException::generateGeneralException('please call init function of refresh token key');
         }
 
         return RefreshTokenSigningKey::$instance->getKeyFromInstance();
@@ -51,7 +51,7 @@ class RefreshTokenSigningKey {
 
     /**
      * @return string
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     private function getKeyFromInstance() {
         if (!isset($instance->key)) {
@@ -62,13 +62,14 @@ class RefreshTokenSigningKey {
 
     /**
      * @return string
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     private function generateNewKeyAndUpdateInDb() {
-        DB::beginTransaction();
-        $rollback = true;
+        $rollback = false;
         try {
-            $key = SigningKeyDb::getKeyValueFromKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
+            DB::beginTransaction();
+            $rollback = true;
+            $key = SigningKeyDb::getKeyValueFromKeyNameForUpdate(REFRESH_TOKEN_KEY_NAME_IN_DB);
             if ($key === null) {
                 $keyValue = Utils::generateNewSigningKey();
                 $currentTime = Utils::getDateTimeStamp();
@@ -76,21 +77,21 @@ class RefreshTokenSigningKey {
                     'keyValue' => $keyValue,
                     'createdAtTime' => $currentTime
                 ];
-                SigningKeyDb::insertKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB, $keyValue, $currentTime);
+                SigningKeyDb::insertKeyValueForKeyName_Transaction(REFRESH_TOKEN_KEY_NAME_IN_DB, $keyValue, $currentTime);
             }
-            $rollback = false;
             DB::commit();
+            $rollback = false;
             return $key['keyValue'];
         } catch (Exception $e) {
             if ($rollback) {
                 DB::rollBack();
             }
-            throw $e;
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 
     /**
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     public static function resetInstance() {
         SigningKeyDb::removeKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);

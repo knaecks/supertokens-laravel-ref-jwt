@@ -1,0 +1,1 @@
+docker run --rm -p 3306:3306 --name mysql -e MYSQL_ROOT_PASSWORD=root -d mysql --default_authentication_plugin=mysql_native_password && sleep 20 && docker exec mysql mysql -u root -proot -e 'create database auth_session;'

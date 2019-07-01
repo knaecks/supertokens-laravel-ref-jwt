@@ -6,8 +6,8 @@ use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use SuperTokens\Session\Db\SigningKeyDb;
-use SuperTokens\Session\Exceptions\GeneralException;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
 
 define("ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB", "access_token_signing_key");
 
@@ -57,7 +57,7 @@ class AccessTokenSigningKey {
     }
 
     /**
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensGeneralException
      */
     public static function init() {
         if (!isset(AccessTokenSigningKey::$instance)) {
@@ -68,53 +68,57 @@ class AccessTokenSigningKey {
 
     /**
      * @return string
-     * @throws Exception
+     * @throws SuperTokensGeneralException
      */
     private function getKeyFromInstance() {
-        try {
-            if (isset($this->userDefinedGet)) {
+        if (isset($this->userDefinedGet)) {
+            try {
                 return call_user_func($this->userDefinedGet);
+            } catch (Exception $e) {
+                throw SuperTokensException::generateGeneralException("Exception thrown from user provided function to get access token signing key", $e);
             }
-
-            if (!isset($instance->signingKey)) {
-                $this->signingKey = $this->maybeGenerateNewKeyAndUpdateInDb();
-            }
-
-            $currentTime = Utils::getDateTimeStamp();
-
-
-            if ($this->isDynamic && $currentTime > ($this->createdAtTime + $this->updateInterval)) {
-                // key has expired, we need to change it.
-                $this->signingKey = $this->maybeGenerateNewKeyAndUpdateInDb();
-            }
-
-            return $this->signingKey;
-        } catch (Exception $e) {
-            throw $e;
         }
+
+        if (!isset($instance->signingKey)) {
+            $newKey = $this->maybeGenerateNewKeyAndUpdateInDb();
+            $this->signingKey = $newKey['keyValue'];
+            $this->createdAtTime = $newKey['createdAtTime'];
+        }
+
+        $currentTime = Utils::getDateTimeStamp();
+
+        if ($this->isDynamic && $currentTime > ($this->createdAtTime + $this->updateInterval)) {
+            // key has expired, we need to change it.
+            $newKey = $this->maybeGenerateNewKeyAndUpdateInDb();
+            $this->signingKey = $newKey['keyValue'];
+            $this->createdAtTime = $newKey['createdAtTime'];
+        }
+
+        return $this->signingKey;
     }
 
     /**
      * @return string
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensGeneralException
      */
     public static function getKey() {
         if (!isset(AccessTokenSigningKey::$instance)) {
-            throw new GeneralException("please call init function of access token signing key");
+            throw SuperTokensException::generateGeneralException("please call init function of access token signing key");
         }
 
         return AccessTokenSigningKey::$instance->getKeyFromInstance();
     }
 
     /**
-     * @return string
-     * @throws Exception
+     * @return array
+     * @throws SuperTokensGeneralException
      */
     private function maybeGenerateNewKeyAndUpdateInDb() {
-        DB::beginTransaction();
-        $rollback = true;
+        $rollback = false;
         try {
-            $key = SigningKeyDb::getKeyValueFromKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
+            DB::beginTransaction();
+            $rollback = true;
+            $key = SigningKeyDb::getKeyValueFromKeyNameForUpdate(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
             $generateNewKey = false;
 
             if ($key !== null) {
@@ -131,27 +135,27 @@ class AccessTokenSigningKey {
                     'keyValue' => $keyValue,
                     'createdAtTime' => $currentTime
                 ];
-                SigningKeyDb::insertKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB, $keyValue, $currentTime);
+                SigningKeyDb::insertKeyValueForKeyName_Transaction(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB, $keyValue, $currentTime);
             }
 
             $this->createdAtTime = $key['createdAtTime'];
-            $rollback = false;
             DB::commit();
-            return $key['keyValue'];
+            $rollback = false;
+            return $key;
         } catch (Exception $e) {
             if ($rollback) {
                 DB::rollBack();
             }
-            throw $e;
+            throw SuperTokensException::generateGeneralException($e);
         }
     }
 
     /**
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensGeneralException
      */
     public static function removeKeyFromMemory() {
         if (!isset(AccessTokenSigningKey::$instance)) {
-            throw new GeneralException("please call init function of access token signing key");
+            throw SuperTokensException::generateGeneralException("please call init function of access token signing key");
         }
 
         AccessTokenSigningKey::$instance->removeKeyFromMemoryInInstance();
@@ -162,7 +166,11 @@ class AccessTokenSigningKey {
         $this->createdAtTime = null;
     }
 
+    /**
+     * @throws SuperTokensGeneralException
+     */
     public static function resetInstance() {
+        SigningKeyDb::removeKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
         AccessTokenSigningKey::$instance = null;
     }
 }

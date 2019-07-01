@@ -3,20 +3,22 @@
 namespace SuperTokens\Session\Tests;
 
 use Exception;
+use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
+use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 use SuperTokens\Session\Session;
 use SuperTokens\Session\AccessToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use SuperTokens\Session\Helpers\AccessTokenSigningKey;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Models\RefreshTokenModel;
 
 class SessionTest extends TestCase {
     use RefreshDatabase;
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testCreateAndGetSession() {
         RefreshTokenSigningKey::resetInstance();
@@ -75,7 +77,7 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testCreateAndGetSessionWhereAccessTokenExpiresAfterOneSec() {
         RefreshTokenSigningKey::resetInstance();
@@ -102,13 +104,14 @@ class SessionTest extends TestCase {
         sleep(2);
         try {
             Session::getSession($newSession['accessToken']['value']);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$TryRefreshTokenException);
+            throw new Exception("test failed");
+        } catch (SuperTokensTryRefreshTokenException $e) {
+            $this->assertTrue(true);
         }
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testCreateAndGetSessionWhereAccessTokenSigningKeyGetsUpdatedEveryTwoSec() {
         RefreshTokenSigningKey::resetInstance();
@@ -134,8 +137,9 @@ class SessionTest extends TestCase {
         sleep(2);
         try {
             Session::getSession($newSession['accessToken']['value']);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$TryRefreshTokenException);
+            throw new Exception("test failed");
+        } catch (SuperTokensTryRefreshTokenException $e) {
+            $this->assertTrue(true);
         }
 
         $newRefreshedSession = Session::refreshSession($newSession['refreshToken']['value']);
@@ -155,7 +159,7 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testAlteringOfPayload() {
         RefreshTokenSigningKey::resetInstance();
@@ -183,13 +187,14 @@ class SessionTest extends TestCase {
 
         try {
             Session::getSession($alteredToken);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$TryRefreshTokenException);
+            throw new Exception("test failed");
+        } catch (SuperTokensTryRefreshTokenException $e) {
+            $this->assertTrue(true);
         }
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testRefreshSession()
     {
@@ -226,8 +231,9 @@ class SessionTest extends TestCase {
         sleep(2);
         try {
             Session::getSession($newSession['accessToken']['value']);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$TryRefreshTokenException);
+            throw new Exception("test failed");
+        } catch (SuperTokensTryRefreshTokenException $e) {
+            $this->assertTrue(true);
         }
 
         $newRefreshedSession = Session::refreshSession($newSession['refreshToken']['value']);
@@ -294,8 +300,9 @@ class SessionTest extends TestCase {
         sleep(2);
         try {
             Session::getSession($newSession['accessToken']['value']);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$TryRefreshTokenException);
+            throw new Exception("test failed");
+        } catch (SuperTokensTryRefreshTokenException $e) {
+            $this->assertTrue(true);
         }
 
         $newRefreshedSession2 = Session::refreshSession($newRefreshedSession['newRefreshToken']['value']);
@@ -314,7 +321,7 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testRefreshSessionWithRefreshTokenValidityLessThanThreeSec() {
         RefreshTokenSigningKey::resetInstance();
@@ -352,11 +359,12 @@ class SessionTest extends TestCase {
             $this->assertIsString($sessionInfo['newAccessToken']['value']);
             $this->assertNotEquals($newRefreshedSession['newAccessToken']['value'], $sessionInfo['newAccessToken']['value']);
 
-            sleep(3);
+            sleep(4);
             try {
                 Session::refreshSession($newRefreshedSession['newRefreshToken']['value']);
-            } catch (SuperTokensAuthException $e) {
-                $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+                throw new Exception("test failed");
+            } catch (SuperTokensUnauthorizedException $e) {
+                $this->assertTrue(true);
             }
         }
 
@@ -392,7 +400,7 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testRevokeAllSessionForUserWithoutBlacklisting() {
         RefreshTokenSigningKey::resetInstance();
@@ -452,7 +460,7 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testRevokeAllSessionForUserWithBlacklisting() {
         RefreshTokenSigningKey::resetInstance();
@@ -480,25 +488,28 @@ class SessionTest extends TestCase {
 
         try {
             Session::getSession($newSession1['accessToken']['value']);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+            throw new Exception("test failed");
+        } catch (SuperTokensUnauthorizedException $e) {
+            $this->assertTrue(true);
         }
 
         try {
             Session::getSession($newSession2['accessToken']['value']);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+            throw new Exception("test failed");
+        } catch (SuperTokensUnauthorizedException $e) {
+            $this->assertTrue(true);
         }
 
         try {
             Session::getSession($newSession3['accessToken']['value']);
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+            throw new Exception("test failed");
+        } catch (SuperTokensUnauthorizedException $e) {
+            $this->assertTrue(true);
         }
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testUpdateSessionInfo() {
         RefreshTokenSigningKey::resetInstance();
@@ -530,7 +541,7 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException | Exception
      */
     public function testRevokeSessionWithoutBlacklisting() {
         RefreshTokenSigningKey::resetInstance();
@@ -562,8 +573,8 @@ class SessionTest extends TestCase {
         try {
             Session::refreshSession($newSession['refreshToken']['value']);
             throw new Exception("test failed");
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+        } catch (SuperTokensUnauthorizedException $e) {
+            $this->assertTrue(true);
         }
 
         $sessionInfo = Session::getSession($newSession['accessToken']['value']);
@@ -579,7 +590,7 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException | Exception
+     * @throws SuperTokensException  | Exception
      */
     public function testRevokeSessionWithBlacklisting() {
         RefreshTokenSigningKey::resetInstance();
@@ -612,15 +623,15 @@ class SessionTest extends TestCase {
         try {
             Session::refreshSession($newSession1['refreshToken']['value']);
             throw new Exception("test failed");
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+        } catch (SuperTokensUnauthorizedException $e) {
+            $this->assertTrue(true);
         }
 
         try {
             Session::getSession($newSession1['accessToken']['value']);
             throw new Exception("test failed");
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$UnauthorizedException);
+        } catch (SuperTokensUnauthorizedException $e) {
+            $this->assertTrue(true);
         }
 
         $sessionInfo = Session::getSession($newSession2['accessToken']['value']);

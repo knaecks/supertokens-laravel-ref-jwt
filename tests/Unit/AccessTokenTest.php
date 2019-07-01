@@ -6,15 +6,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Exception;
 use SuperTokens\Session\AccessToken;
+use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 use SuperTokens\Session\Helpers\AccessTokenSigningKey;
 use SuperTokens\Session\Session;
-use SuperTokens\Session\Exceptions\SuperTokensAuthException;
+use SuperTokens\Session\Exceptions\SuperTokensException;
 
 class AccessTokenTest extends TestCase {
     use RefreshDatabase;
 
     /**
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensException
      */
     public function testCreateAndGetInfo() {
         AccessTokenSigningKey::resetInstance();
@@ -43,7 +44,7 @@ class AccessTokenTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensException
      */
     public function testUserDefinedSingingKeyFunction() {
         AccessTokenSigningKey::resetInstance();
@@ -56,7 +57,7 @@ class AccessTokenTest extends TestCase {
     }
 
     /**
-     * @throws SuperTokensAuthException
+     * @throws SuperTokensException
      */
     public function testVeryShortUpdateIntervalForSingingKey() {
         AccessTokenSigningKey::resetInstance();
@@ -91,8 +92,10 @@ class AccessTokenTest extends TestCase {
         try {
             AccessToken::getInfoFromAccessToken(($token['token']));
             throw new Exception("test failed");
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$TryRefreshTokenException);
+        } catch (SuperTokensTryRefreshTokenException $e) {
+            $this->assertTrue(true);
+        } catch (Exception $e) {
+            throw new Exception("test failed");
         }
     }
 
@@ -117,8 +120,10 @@ class AccessTokenTest extends TestCase {
         try {
             AccessToken::getInfoFromAccessToken(($token['token']));
             throw new Exception("test failed");
-        } catch (SuperTokensAuthException $e) {
-            $this->assertEquals($e->getCode(), SuperTokensAuthException::$TryRefreshTokenException);
+        } catch (SuperTokensTryRefreshTokenException $e) {
+            $this->assertTrue(true);
+        } catch (Exception $e) {
+            throw new Exception("test failed");
         }
     }
 }
