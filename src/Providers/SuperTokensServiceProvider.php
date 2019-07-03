@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Models\RefreshTokenModel;
-use SuperTokens\Session\Session;
+use SuperTokens\Session\SuperToken;
 
 class SuperTokensServiceProvider extends ServiceProvider {
     /**
@@ -42,7 +42,7 @@ class SuperTokensServiceProvider extends ServiceProvider {
 
     private function registerFacades() {
         $this->app->singleton("SuperTokens", function ($app) {
-            return new Session();
+            return new SuperToken();
         });
     }
 

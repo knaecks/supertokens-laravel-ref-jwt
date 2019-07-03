@@ -30,18 +30,22 @@ abstract class TestCase extends BaseTestCase {
             'tokens' => [
                 'accessToken' => [
                     'signingKey' => [
-                        'dynamic' => env('AA', true),
-                        'updateInterval' => env('BB', 24),
+                        'dynamic' => true,
+                        'updateInterval' => 24,
                         'get' => null,
                     ],
-                    'validity' => env('DD', 3600),
-                    'blacklisting' => env('EE', false),
+                    'validity' => 3600,
+                    'blacklisting' => false,
                 ],
                 'refreshToken' => [
-                    'validity' => env('FF', 2400),
-                    'removalCronjobInterval' => env('GG'),
-                    'renewTokenPath' => env('HH'),
+                    'validity' => 2400,
+                    'removalCronjobInterval' => '* * 1-31/7 * *',
+                    'renewTokenPath' => '/renew',
                 ],
+            ],
+            'cookie' => [
+                'domain' => 'localhost',
+                'secure' => false
             ]
         ]);
     }

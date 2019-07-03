@@ -14,11 +14,6 @@ use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 class RefreshToken {
 
     /**
-     * @var int
-     */
-    private static $validity;
-
-    /**
      * @param $token
      * @return array
      * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
@@ -89,9 +84,6 @@ class RefreshToken {
     }
 
     public static function getValidity() {
-        if (!isset(RefreshToken::$validity)) {
-            RefreshToken::$validity = Config::get('supertokens.tokens.refreshToken.validity') * 60 * 60;
-        }
-        return RefreshToken::$validity;
+        return Config::get('supertokens.tokens.refreshToken.validity') * 60 * 60;
     }
 }

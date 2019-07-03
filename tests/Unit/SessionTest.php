@@ -360,7 +360,7 @@ class SessionTest extends TestCase {
             $this->assertIsString($sessionInfo['newAccessToken']['value']);
             $this->assertNotEquals($newRefreshedSession['newAccessToken']['value'], $sessionInfo['newAccessToken']['value']);
 
-            sleep(5);
+            sleep(4);
             try {
                 Session::refreshSession($newRefreshedSession['newRefreshToken']['value']);
                 throw new Exception("test failed");

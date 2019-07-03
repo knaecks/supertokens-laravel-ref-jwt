@@ -174,7 +174,9 @@ class Session {
      * @param $refreshToken
      * @param $refreshTokenInfo
      * @return array
-     * @throws SuperTokensGeneralException | SuperTokensUnauthorizedException
+     * @throws SuperTokensGeneralException
+     * @throws SuperTokensUnauthorizedException
+     * @throws SuperTokensTokenTheftException
      */
     public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
@@ -266,6 +268,12 @@ class Session {
         } catch (Exception $e) {
             if ($rollback) {
                 DB::rollBack();
+            }
+            if ($e instanceof SuperTokensTokenTheftException) {
+                throw $e;
+            }
+            if ($e instanceof SuperTokensUnauthorizedException) {
+                throw $e;
             }
             throw SuperTokensException::generateGeneralException($e);
         }

@@ -17,5 +17,9 @@ return [
             'removalCronjobInterval' => env('SUPER_TOKEN_RT_AUTO_REMOVE_INTERVAL', '0 0 1-31/7 * *'),
             'renewTokenPath' => env('SUPER_TOKEN_RT_RENEW_PATH'),
         ],
+    ],
+    'cookie' => [
+        'domain' => env('SUPER_TOKEN_COOKIE_DOMAIN', 'localhost'),
+        'secure' => env('SUPER_TOKEN_COOKIE_SECURE', true)
     ]
 ];
