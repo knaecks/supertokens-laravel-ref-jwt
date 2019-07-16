@@ -40,9 +40,11 @@ class AccessToken {
             $refreshTokenHash1 = Utils::sanitizeStringInput($payload['rt']);
             $expiryTime = Utils::sanitizeNumberInput($payload['expiryTime']);
             $parentRefreshTokenHash1 = Utils::sanitizeStringInput($payload['prt']);
+            $antiCsrfToken = Utils::sanitizeStringInput($payload['antiCsrfToken']);
             $userPayload = $payload['userPayload'];
 
-            if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime)) {
+            if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime) ||
+                !isset($antiCsrfToken)) {
                 // it would come here if we change the structure of the JWT.
                 // throw error
                 throw new Exception("invalid access token payload");
@@ -60,6 +62,7 @@ class AccessToken {
                 'expiryTime' => $expiryTime,
                 'parentRefreshTokenHash1' => $parentRefreshTokenHash1,
                 'userPayload' => $userPayload,
+                'antiCsrfToken' => $antiCsrfToken
             ];
         } catch (Exception $e) {
             throw SuperTokensException::generateTryRefreshTokenException($e);
@@ -70,12 +73,13 @@ class AccessToken {
      * @param $sessionHandle
      * @param $userId
      * @param $refreshTokenHash1
+     * @param $antiCsrfToken
      * @param $parentRefreshTokenHash1
      * @param $userPayload
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload) {
+    public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $antiCsrfToken, $parentRefreshTokenHash1, $userPayload) {
 
         try {
             $key = AccessTokenSigningKey::getKey();
@@ -87,6 +91,7 @@ class AccessToken {
                 'sessionHandle' => $sessionHandle,
                 'userId' => $userId,
                 'rt' => $refreshTokenHash1,
+                'antiCsrfToken' => $antiCsrfToken,
                 'prt' => $parentRefreshTokenHash1,
                 'expiryTime' => $expiry,
                 'userPayload' => $userPayload

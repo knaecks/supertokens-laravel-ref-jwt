@@ -61,10 +61,11 @@ class SessionTest extends TestCase {
         $this->assertIsString($newSession['session']['handle']);
         $this->assertEquals($newSession['session']['userId'], $userId);
         $this->assertEquals($newSession['session']['jwtPayload'], $jwtPayload);
+        $this->assertIsString($newSession['antiCsrfToken']);
         $noOfRows = RefreshTokenModel::all()->count();
         $this->assertEquals($noOfRows, 1);
 
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertIsArray($sessionInfo);
         $this->assertArrayNotHasKey("newAccessToken", $sessionInfo);
         $this->assertArrayHasKey("session", $sessionInfo);
@@ -93,7 +94,7 @@ class SessionTest extends TestCase {
         ];
 
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
         $this->assertEquals(SessionHandlingFunctions::getSessionData($sessionInfo['session']['handle']), $sessionData);
 
@@ -101,7 +102,7 @@ class SessionTest extends TestCase {
         $sessionData = 123;
 
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
         $this->assertEquals(SessionHandlingFunctions::getSessionData($sessionInfo['session']['handle']), $sessionData);
 
@@ -109,7 +110,7 @@ class SessionTest extends TestCase {
         $sessionData = "bye";
 
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
         $this->assertEquals(SessionHandlingFunctions::getSessionData($sessionInfo['session']['handle']), $sessionData);
 
@@ -117,7 +118,7 @@ class SessionTest extends TestCase {
         $sessionData = false;
 
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
         $this->assertEquals(SessionHandlingFunctions::getSessionData($sessionInfo['session']['handle']), $sessionData);
 
@@ -125,7 +126,7 @@ class SessionTest extends TestCase {
         $sessionData = [true, 1, 2, "bye", [1, 3, "hi"]];
 
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
         $this->assertEquals(SessionHandlingFunctions::getSessionData($sessionInfo['session']['handle']), $sessionData);
 
@@ -133,7 +134,7 @@ class SessionTest extends TestCase {
         $sessionData = null;
 
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
         $this->assertEquals(SessionHandlingFunctions::getSessionData($sessionInfo['session']['handle']), $sessionData);
     }
@@ -165,7 +166,7 @@ class SessionTest extends TestCase {
 
         sleep(2);
         try {
-            SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensTryRefreshTokenException $e) {
             $this->assertTrue(true);
@@ -198,7 +199,7 @@ class SessionTest extends TestCase {
 
         sleep(2);
         try {
-            SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensTryRefreshTokenException $e) {
             $this->assertTrue(true);
@@ -211,7 +212,7 @@ class SessionTest extends TestCase {
         $this->assertIsString($newRefreshedSession['newAccessToken']['value']);
         $this->assertNotEquals($newRefreshedSession['newAccessToken']['value'], $newSession['accessToken']['value']);
 
-        $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value'], $newRefreshedSession['newAntiCsrfToken']);
         $this->assertIsArray($sessionInfo);
         $this->assertArrayHasKey("session", $sessionInfo);
         $this->assertArrayHasKey("userId", $sessionInfo['session']);
@@ -242,13 +243,13 @@ class SessionTest extends TestCase {
         $this->assertArrayHasKey("value", $newSession['accessToken']);
         $this->assertIsString($newSession['accessToken']['value']);
 
-        SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
 
         $alteredPayload = base64_encode(json_encode(array_merge($jwtPayload, [ 'b' => "new field" ])));
         $alteredToken = explode(".", $newSession['accessToken']['value'])[0].$alteredPayload.explode(".", $newSession['accessToken']['value'])[2];
 
         try {
-            SessionHandlingFunctions::getSession($alteredToken);
+            SessionHandlingFunctions::getSession($alteredToken, $newSession['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensTryRefreshTokenException $e) {
             $this->assertTrue(true);
@@ -292,7 +293,7 @@ class SessionTest extends TestCase {
 
         sleep(2);
         try {
-            SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensTryRefreshTokenException $e) {
             $this->assertTrue(true);
@@ -330,7 +331,7 @@ class SessionTest extends TestCase {
         $this->assertEquals($newRefreshedSession['session']['userId'], $userId);
         $this->assertEquals($newRefreshedSession['session']['jwtPayload'], $jwtPayload);
 
-        $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value'], $newRefreshedSession['newAntiCsrfToken']);
         $this->assertIsArray($sessionInfo);
         $this->assertArrayHasKey("newAccessToken", $sessionInfo);
         $this->assertArrayHasKey("value", $sessionInfo['newAccessToken']);
@@ -348,7 +349,7 @@ class SessionTest extends TestCase {
         $this->assertEquals($sessionInfo['session']['userId'], $userId);
         $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
 
-        $newSessionInfo = SessionHandlingFunctions::getSession($sessionInfo['newAccessToken']['value']);
+        $newSessionInfo = SessionHandlingFunctions::getSession($sessionInfo['newAccessToken']['value'], $newRefreshedSession['newAntiCsrfToken']);
         $this->assertIsArray($newSessionInfo);
         $this->assertArrayNotHasKey("newAccessToken", $newSessionInfo);
         $this->assertArrayHasKey("session", $newSessionInfo);
@@ -361,7 +362,7 @@ class SessionTest extends TestCase {
 
         sleep(2);
         try {
-            SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newRefreshedSession['newAntiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensTryRefreshTokenException $e) {
             $this->assertTrue(true);
@@ -375,7 +376,7 @@ class SessionTest extends TestCase {
         $this->assertNotEquals($newRefreshedSession2['newAccessToken']['value'], $newSession['accessToken']['value']);
         $this->assertNotEquals($newRefreshedSession2['newAccessToken']['value'], $sessionInfo['newAccessToken']['value']);
 
-        $sessionInfo2 = SessionHandlingFunctions::getSession($newRefreshedSession2['newAccessToken']['value']);
+        $sessionInfo2 = SessionHandlingFunctions::getSession($newRefreshedSession2['newAccessToken']['value'], $newRefreshedSession2['newAntiCsrfToken']);
         $this->assertIsArray($sessionInfo2);
         $this->assertArrayHasKey("session", $sessionInfo2);
         $this->assertArrayHasKey("newAccessToken", $sessionInfo2);
@@ -414,7 +415,7 @@ class SessionTest extends TestCase {
             $this->assertIsArray($newRefreshedSession['newAccessToken']);
             $this->assertArrayHasKey("value", $newRefreshedSession['newAccessToken']);
 
-            $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value']);
+            $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value'], $newRefreshedSession['newAntiCsrfToken']);
             $this->assertIsArray($sessionInfo);
             $this->assertArrayHasKey("newAccessToken", $sessionInfo);
             $this->assertArrayHasKey("value", $sessionInfo['newAccessToken']);
@@ -487,7 +488,7 @@ class SessionTest extends TestCase {
         $noOfRows = RefreshTokenModel::all()->count();
         $this->assertEquals($noOfRows, 0);
 
-        $sessionInfo1 = SessionHandlingFunctions::getSession($newSession1['accessToken']['value']);
+        $sessionInfo1 = SessionHandlingFunctions::getSession($newSession1['accessToken']['value'], $newSession1['antiCsrfToken']);
         $this->assertIsArray($sessionInfo1);
         $this->assertArrayNotHasKey("newAccessToken", $sessionInfo1);
         $this->assertArrayHasKey("session", $sessionInfo1);
@@ -498,7 +499,7 @@ class SessionTest extends TestCase {
         $this->assertEquals($sessionInfo1['session']['userId'], $userId);
         $this->assertEquals($sessionInfo1['session']['jwtPayload'], $jwtPayload);
 
-        $sessionInfo2 = SessionHandlingFunctions::getSession($newSession2['accessToken']['value']);
+        $sessionInfo2 = SessionHandlingFunctions::getSession($newSession2['accessToken']['value'], $newSession2['antiCsrfToken']);
         $this->assertIsArray($sessionInfo2);
         $this->assertArrayNotHasKey("newAccessToken", $sessionInfo2);
         $this->assertArrayHasKey("session", $sessionInfo2);
@@ -509,7 +510,7 @@ class SessionTest extends TestCase {
         $this->assertEquals($sessionInfo2['session']['userId'], $userId);
         $this->assertEquals($sessionInfo2['session']['jwtPayload'], $jwtPayload);
 
-        $sessionInfo3 = SessionHandlingFunctions::getSession($newSession3['accessToken']['value']);
+        $sessionInfo3 = SessionHandlingFunctions::getSession($newSession3['accessToken']['value'], $newSession3['antiCsrfToken']);
         $this->assertIsArray($sessionInfo3);
         $this->assertArrayNotHasKey("newAccessToken", $sessionInfo3);
         $this->assertArrayHasKey("session", $sessionInfo3);
@@ -549,21 +550,21 @@ class SessionTest extends TestCase {
         $this->assertEquals($noOfRows, 0);
 
         try {
-            SessionHandlingFunctions::getSession($newSession1['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession1['accessToken']['value'], $newSession1['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensUnauthorizedException $e) {
             $this->assertTrue(true);
         }
 
         try {
-            SessionHandlingFunctions::getSession($newSession2['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession2['accessToken']['value'], $newSession2['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensUnauthorizedException $e) {
             $this->assertTrue(true);
         }
 
         try {
-            SessionHandlingFunctions::getSession($newSession3['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession3['accessToken']['value'], $newSession3['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensUnauthorizedException $e) {
             $this->assertTrue(true);
@@ -639,7 +640,7 @@ class SessionTest extends TestCase {
             $this->assertTrue(true);
         }
 
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], $newSession['antiCsrfToken']);
         $this->assertIsArray($sessionInfo);
         $this->assertArrayNotHasKey("newAccessToken", $sessionInfo);
         $this->assertArrayHasKey("session", $sessionInfo);
@@ -690,13 +691,13 @@ class SessionTest extends TestCase {
         }
 
         try {
-            SessionHandlingFunctions::getSession($newSession1['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession1['accessToken']['value'], $newSession1['antiCsrfToken']);
             throw new Exception("test failed");
         } catch (SuperTokensUnauthorizedException $e) {
             $this->assertTrue(true);
         }
 
-        $sessionInfo = SessionHandlingFunctions::getSession($newSession2['accessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newSession2['accessToken']['value'], $newSession2['antiCsrfToken']);
         $this->assertIsArray($sessionInfo);
         $this->assertArrayNotHasKey("newAccessToken", $sessionInfo);
         $this->assertArrayHasKey("session", $sessionInfo);
@@ -741,7 +742,7 @@ class SessionTest extends TestCase {
         $this->assertIsArray($newRefreshedSession['newAccessToken']);
         $this->assertArrayHasKey("value", $newRefreshedSession['newAccessToken']);
 
-        $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value']);
+        $sessionInfo = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value'], $newRefreshedSession['newAntiCsrfToken']);
         $this->assertIsArray($sessionInfo);
         $this->assertArrayHasKey("newAccessToken", $sessionInfo);
         $this->assertArrayHasKey("value", $sessionInfo['newAccessToken']);

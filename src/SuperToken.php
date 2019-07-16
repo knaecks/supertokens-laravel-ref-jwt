@@ -6,8 +6,9 @@ namespace SuperTokens\Session;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Exceptions\SuperTokensTokenTheftException;
-use SuperTokens\Session\Helpers\Cookie;
+use SuperTokens\Session\Helpers\CookieAndHeader;
 use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
@@ -33,9 +34,10 @@ class SuperToken {
     public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionData = null) {
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
 
-        Cookie::attachAccessTokenToCookie($response, $newSession['accessToken']['value'], $newSession['accessToken']['expires']);
-        Cookie::attachRefreshTokenToCookie($response, $newSession['refreshToken']['value'], $newSession['refreshToken']['expires']);
-        Cookie::attachIdRefreshTokenToCookie($response, $newSession['idRefreshToken']['value'], $newSession['idRefreshToken']['expires']);
+        CookieAndHeader::attachAccessTokenToCookie($response, $newSession['accessToken']['value'], $newSession['accessToken']['expires']);
+        CookieAndHeader::attachRefreshTokenToCookie($response, $newSession['refreshToken']['value'], $newSession['refreshToken']['expires']);
+        CookieAndHeader::attachIdRefreshTokenToCookie($response, $newSession['idRefreshToken']['value'], $newSession['idRefreshToken']['expires']);
+        CookieAndHeader::attachAntiCsrfHeader($response, $newSession['antiCsrfToken']);
 
         return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
     }
@@ -48,27 +50,31 @@ class SuperToken {
      * @throws SuperTokensTryRefreshTokenException
      * @throws SuperTokensUnauthorizedException
      */
-    public static function getSession(Request $request, Response $response) {
-        $idRefreshToken = Cookie::getIdRefreshTokenFromCookie($request);
+    public static function getSession(Request $request, Response $response, $enableCsrfProtection) {
+        $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
 
         if (!isset($idRefreshToken) || $idRefreshToken === null) {
-            Cookie::clearSessionFromCookie($response);
-            throw new SuperTokensUnauthorizedException("missing auth tokens in cookies");
+            CookieAndHeader::clearSessionFromCookie($response);
+            throw SuperTokensException::generateUnauthorisedException("missing auth tokens in cookies");
         }
 
-        $accessToken = Cookie::getAccessTokenFromCookie($request);
+        $accessToken = CookieAndHeader::getAccessTokenFromCookie($request);
         if (!isset($accessToken)) {
-            throw new SuperTokensTryRefreshTokenException("access token missing in cookies");
+            throw SuperTokensException::generateTryRefreshTokenException("access token missing in cookies");
         }
 
         try {
-            $newSession = SessionHandlingFunctions::getSession($accessToken);
+            $antiCsrfToken = $enableCsrfProtection ? CookieAndHeader::getAntiCsrfHeader($request) : null;
+            if ($antiCsrfToken === null && $enableCsrfProtection) {
+                throw SuperTokensException::generateTryRefreshTokenException("anti csrf token is missing");
+            }
+            $newSession = SessionHandlingFunctions::getSession($accessToken, $antiCsrfToken);
             if (isset($newSession['newAccessToken'])) {
-                Cookie::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);
+                CookieAndHeader::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);
             }
             return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
         } catch (SuperTokensUnauthorizedException $e) {
-            Cookie::clearSessionFromCookie($response);
+            CookieAndHeader::clearSessionFromCookie($response);
             throw $e;
         }
     }
@@ -83,26 +89,27 @@ class SuperToken {
      * @throws SuperTokensTokenTheftException
  */
     public static function refreshSession(Request $request, Response $response) {
-        $refreshToken = Cookie::getRefreshTokenFromCookie($request);
-        $idRefreshToken = Cookie::getIdRefreshTokenFromCookie($request);
+        $refreshToken = CookieAndHeader::getRefreshTokenFromCookie($request);
+        $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
         if (!isset($refreshToken) || !isset($idRefreshToken)) {
-            Cookie::clearSessionFromCookie($response);
-            throw new SuperTokensUnauthorizedException("missing auth tokens in cookies");
+            CookieAndHeader::clearSessionFromCookie($response);
+            throw SuperTokensException::generateUnauthorisedException("missing auth tokens in cookies");
         }
 
         try {
             $newSession = SessionHandlingFunctions::refreshSession($refreshToken);
 
-            Cookie::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);
-            Cookie::attachRefreshTokenToCookie($response, $newSession['newRefreshToken']['value'], $newSession['newRefreshToken']['expires']);
-            Cookie::attachIdRefreshTokenToCookie($response, $newSession['newIdRefreshToken']['value'], $newSession['newIdRefreshToken']['expires']);
+            CookieAndHeader::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);
+            CookieAndHeader::attachRefreshTokenToCookie($response, $newSession['newRefreshToken']['value'], $newSession['newRefreshToken']['expires']);
+            CookieAndHeader::attachIdRefreshTokenToCookie($response, $newSession['newIdRefreshToken']['value'], $newSession['newIdRefreshToken']['expires']);
+            CookieAndHeader::attachAntiCsrfHeader($response, $newSession['newAntiCsrfToken']);
 
             return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
         } catch (SuperTokensUnauthorizedException $e) {
-            Cookie::clearSessionFromCookie($response);
+            CookieAndHeader::clearSessionFromCookie($response);
             throw $e;
         } catch (SuperTokensTokenTheftException $e) {
-            Cookie::clearSessionFromCookie($response);
+            CookieAndHeader::clearSessionFromCookie($response);
             throw $e;
         }
     }

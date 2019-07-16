@@ -10,8 +10,26 @@ use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 define("ACCESS_TOKEN_COOKIE_KEY", "sAccessToken");
 define("REFRESH_TOKEN_COOKIE_KEY", "sRefreshToken");
 define("ID_REFRESH_TOKEN_COOKIE_KEY", "sIdRefreshToken");
+define("ANTI_CSRF_HEADER_KEY", "anti-csrf");
 
-class Cookie {
+class CookieAndHeader {
+
+    private static function setHeader(Response $response, $key, $value) {
+        $response->header($key, $value);
+    }
+
+    private static function getHeader(Request $request, $key) {
+        $value = $request->header($key);
+        return $value;
+    }
+
+    public static function attachAntiCsrfHeader(Response $response, $value) {
+        CookieAndHeader::setHeader($response, ANTI_CSRF_HEADER_KEY, $value);
+    }
+
+    public static function getAntiCsrfHeader(Request $request) {
+        return CookieAndHeader::getHeader($request, ANTI_CSRF_HEADER_KEY);
+    }
 
     /**
      * @param Response $response
@@ -25,7 +43,6 @@ class Cookie {
      */
     public static function setCookie(Response $response, $key, $value, $minutes, $path, $domain, $secure, $httpOnly) {
         $response->withCookie(cookie($key, $value, $minutes, $path, $domain, $secure, $httpOnly));
-        return;
     }
 
     /**
@@ -43,9 +60,9 @@ class Cookie {
      * @param Response $response
      */
     public static function clearSessionFromCookie(Response $response) {
-        Cookie::setCookie($response, ACCESS_TOKEN_COOKIE_KEY, "", 0, "/", Cookie::getDomain(), Cookie::getSecure(), true);
-        Cookie::setCookie($response, ID_REFRESH_TOKEN_COOKIE_KEY, "", 0, "/", Cookie::getDomain(), false, false);
-        Cookie::setCookie($response, REFRESH_TOKEN_COOKIE_KEY, "", 0, Cookie::getRefreshTokenPath(), Cookie::getDomain(), Cookie::getSecure(), true);
+        CookieAndHeader::setCookie($response, ACCESS_TOKEN_COOKIE_KEY, "", 0, "/", CookieAndHeader::getDomain(), CookieAndHeader::getSecure(), true);
+        CookieAndHeader::setCookie($response, ID_REFRESH_TOKEN_COOKIE_KEY, "", 0, "/", CookieAndHeader::getDomain(), false, false);
+        CookieAndHeader::setCookie($response, REFRESH_TOKEN_COOKIE_KEY, "", 0, CookieAndHeader::getRefreshTokenPath(), CookieAndHeader::getDomain(), CookieAndHeader::getSecure(), true);
     }
 
     /**
@@ -55,7 +72,7 @@ class Cookie {
      * @throws SuperTokensGeneralException
      */
     public static function attachAccessTokenToCookie(Response $response, $token, $expiresAt) {
-        Cookie::setCookie($response, ACCESS_TOKEN_COOKIE_KEY, $token, Cookie::getMinutes($expiresAt), "/", Cookie::getDomain(), Cookie::getSecure(), true);
+        CookieAndHeader::setCookie($response, ACCESS_TOKEN_COOKIE_KEY, $token, CookieAndHeader::getMinutes($expiresAt), "/", CookieAndHeader::getDomain(), CookieAndHeader::getSecure(), true);
     }
 
     /**
@@ -65,7 +82,7 @@ class Cookie {
      * @throws SuperTokensGeneralException
      */
     public static function attachRefreshTokenToCookie(Response $response, $token, $expiresAt) {
-        Cookie::setCookie($response, REFRESH_TOKEN_COOKIE_KEY, $token, Cookie::getMinutes($expiresAt), Cookie::getRefreshTokenPath(), Cookie::getDomain(), Cookie::getSecure(), true);
+        CookieAndHeader::setCookie($response, REFRESH_TOKEN_COOKIE_KEY, $token, CookieAndHeader::getMinutes($expiresAt), CookieAndHeader::getRefreshTokenPath(), CookieAndHeader::getDomain(), CookieAndHeader::getSecure(), true);
     }
 
     /**
@@ -75,7 +92,7 @@ class Cookie {
      * @throws SuperTokensGeneralException
      */
     public static function attachIdRefreshTokenToCookie(Response $response, $token, $expiresAt) {
-        Cookie::setCookie($response, ID_REFRESH_TOKEN_COOKIE_KEY, $token, Cookie::getMinutes($expiresAt), "/", Cookie::getDomain(), false, false);
+        CookieAndHeader::setCookie($response, ID_REFRESH_TOKEN_COOKIE_KEY, $token, CookieAndHeader::getMinutes($expiresAt), "/", CookieAndHeader::getDomain(), false, false);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace SuperTokens\Session;
 use Illuminate\Http\Response;
 use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
-use SuperTokens\Session\Helpers\Cookie;
+use SuperTokens\Session\Helpers\CookieAndHeader;
 
 class Session {
     /**
@@ -47,7 +47,7 @@ class Session {
      */
     public function revokeSession() {
         SuperToken::revokeSessionUsingSessionHandle($this->sessionHandle);
-        Cookie::clearSessionFromCookie($this->response);
+        CookieAndHeader::clearSessionFromCookie($this->response);
     }
 
     /**
@@ -59,7 +59,7 @@ class Session {
         try {
             return SessionHandlingFunctions::getSessionData($this->sessionHandle);
         } catch (SuperTokensUnauthorizedException $e) {
-            Cookie::clearSessionFromCookie($this->response);
+            CookieAndHeader::clearSessionFromCookie($this->response);
             throw $e;
         }
     }
@@ -73,7 +73,7 @@ class Session {
         try {
             SessionHandlingFunctions::updateSessionData($this->sessionHandle, $newSessionData);
         } catch (SuperTokensUnauthorizedException $e) {
-            Cookie::clearSessionFromCookie($this->response);
+            CookieAndHeader::clearSessionFromCookie($this->response);
             throw $e;
         }
     }

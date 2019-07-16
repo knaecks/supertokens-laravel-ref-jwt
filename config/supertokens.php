@@ -11,7 +11,9 @@ return [
             ],
             'validity' => env('SUPER_TOKEN_AT_VALIDITY', 3600),
             'blacklisting' => env('SUPER_TOKEN_AT_BLACKLISTING', false),
+            'accessTokenPath' => env('SUPER_TOKEN_AT_PATH', "/"),
         ],
+        'enableAntiCsrf' => env('SUPER_TOKEN_ENABLE_ANTI_CSRF', true),
         'refreshToken' => [
             'validity' => env('SUPER_TOKEN_RT_VALIDITY', 2400),
             'removalCronjobInterval' => env('SUPER_TOKEN_RT_AUTO_REMOVE_INTERVAL', '0 0 1-31/7 * *'),

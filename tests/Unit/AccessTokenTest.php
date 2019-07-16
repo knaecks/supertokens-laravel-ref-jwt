@@ -28,13 +28,15 @@ class AccessTokenTest extends TestCase {
         $userPayload = [
             "a" => "a"
         ];
+        $antiCsrfToken = "";
 
-        $token = AccessToken::createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload);
+        $token = AccessToken::createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $antiCsrfToken, $parentRefreshTokenHash1, $userPayload);
         $infoFromToken = AccessToken::getInfoFromAccessToken(($token['token']));
         $this->assertEquals($infoFromToken, [
             "sessionHandle" => "sessionHandle",
             "userId" => "userId",
             "refreshTokenHash1" => "refreshTokenHash1",
+            "antiCsrfToken" => "",
             "expiryTime" => $token['expiry'],
             "parentRefreshTokenHash1" => "parentRefreshTokenHash1",
             "userPayload" => [
@@ -86,7 +88,8 @@ class AccessTokenTest extends TestCase {
         $userPayload = [
             "a" => "a"
         ];
-        $token = AccessToken::createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload);
+        $antiCsrfToken = "csrf";
+        $token = AccessToken::createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $antiCsrfToken, $parentRefreshTokenHash1, $userPayload);
         sleep(2);
 
         try {
@@ -114,7 +117,8 @@ class AccessTokenTest extends TestCase {
         $userPayload = [
             "a" => "a"
         ];
-        $token = AccessToken::createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $parentRefreshTokenHash1, $userPayload);
+        $antiCsrfToken = "csrf";
+        $token = AccessToken::createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $antiCsrfToken, $parentRefreshTokenHash1, $userPayload);
         sleep(2);
 
         try {

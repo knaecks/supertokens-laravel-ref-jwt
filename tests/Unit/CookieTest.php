@@ -4,7 +4,7 @@ namespace SuperTokens\Session\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use SuperTokens\Session\Helpers\Cookie;
+use SuperTokens\Session\Helpers\CookieAndHeader;
 
 
 class CookieTest extends TestCase {
@@ -20,7 +20,7 @@ class CookieTest extends TestCase {
         $path = '/';
         $minutes = 10;
 
-        Cookie::setCookie($response, $key, $value, $minutes, $path, $domain, $secure, $httpOnly);
+        CookieAndHeader::setCookie($response, $key, $value, $minutes, $path, $domain, $secure, $httpOnly);
 
         $this->assertIsObject($response->headers);
         $this->assertIsArray($response->headers->getCookies());
@@ -40,7 +40,7 @@ class CookieTest extends TestCase {
 
         $request = new Request([], [], [], [$key => $value]);
 
-        $cookieValue = Cookie::getCookie($request, $key);
+        $cookieValue = CookieAndHeader::getCookie($request, $key);
         $this->assertEquals($cookieValue, $value);
     }
 }
