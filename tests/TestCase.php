@@ -48,5 +48,6 @@ abstract class TestCase extends BaseTestCase {
                 'secure' => false
             ]
         ]);
+        $app['config']->set('env',  "testing");
     }
 }

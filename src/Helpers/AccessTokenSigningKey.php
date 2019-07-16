@@ -171,6 +171,9 @@ class AccessTokenSigningKey {
      * @throws SuperTokensGeneralException
      */
     public static function resetInstance() {
+        if (Config::get('env') !== "testing") {
+            throw SuperTokensException::generateGeneralException("AccessToken reset should only be called during testing");
+        }
         if (App::environment("testing")) {
             SigningKeyDb::removeKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
             AccessTokenSigningKey::$instance = null;

@@ -46,12 +46,17 @@ class SuperTokensServiceProvider extends ServiceProvider {
         });
     }
 
+    // TODO: test that this cron job is running.
     private function registerScheduler() {
         $this->app->booted(function () {
             $schedule = app(Schedule::class);
             $schedule->call(function () {
                 $currentTimestamp = Utils::getDateTimeStamp();
-                RefreshTokenModel::where('expires_at', '<=', $currentTimestamp)->delete();
+                try {
+                    RefreshTokenModel::where('expires_at', '<=', $currentTimestamp)->delete();
+                } catch (Exception $e) {
+                    /* we ignore the error */
+                }
             })->cron(Config::get('supertokens.tokens.refreshToken.removalCronjobInterval'));
         });
     }

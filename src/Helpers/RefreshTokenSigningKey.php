@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use SuperTokens\Session\Db\SigningKeyDb;
 use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensException;
+use Illuminate\Support\Facades\Config;
 
 define("REFRESH_TOKEN_KEY_NAME_IN_DB", "refresh_token_key");
 
@@ -95,6 +96,9 @@ class RefreshTokenSigningKey {
      * @throws SuperTokensGeneralException
      */
     public static function resetInstance() {
+        if (Config::get('env') !== "testing") {
+            throw SuperTokensException::generateGeneralException("RefreshToken reset should only be called during testing");
+        }
         if (App::environment("testing")) {
             SigningKeyDb::removeKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
             RefreshTokenSigningKey::$instance = null;
