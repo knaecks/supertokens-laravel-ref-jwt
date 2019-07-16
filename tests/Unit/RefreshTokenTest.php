@@ -2,13 +2,12 @@
 
 namespace SuperTokens\Session\Tests;
 
-use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
-use SuperTokens\Session\Session;
+use SuperTokens\Session\SessionHandlingFunctions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Exception;
-use SuperTokens\Session\RefreshToken;
+use SuperTokens\Session\Helpers\RefreshToken;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 
 class RefreshTokenTest extends TestCase {
@@ -19,7 +18,7 @@ class RefreshTokenTest extends TestCase {
      */
     public function testCreateAndVerifyRefreshTokenSameSigningKey() {
         RefreshTokenSigningKey::resetInstance();
-        new Session();
+        new SessionHandlingFunctions();
 
         $sessionHandle = "sessionHandle";
         $parentRefreshTokenHash1 = "parentRefreshTokenHash1";
@@ -40,7 +39,7 @@ class RefreshTokenTest extends TestCase {
      */
     public function testCreateAndVerifyRefreshTokenDifferentSigningKey() {
         RefreshTokenSigningKey::resetInstance();
-        new Session();
+        new SessionHandlingFunctions();
 
         $sessionHandle = "sessionHandle";
         $parentRefreshTokenHash1 = "parentRefreshTokenHash1";
@@ -49,7 +48,7 @@ class RefreshTokenTest extends TestCase {
         $token = RefreshToken::createNewRefreshToken($sessionHandle, $userId, $parentRefreshTokenHash1);
 
         RefreshTokenSigningKey::resetInstance();
-        new Session();
+        new SessionHandlingFunctions();
         try {
             RefreshToken::getInfoFromRefreshToken($token['token']);
             throw new Exception("test failed");

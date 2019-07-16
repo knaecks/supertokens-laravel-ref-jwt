@@ -10,7 +10,7 @@ use SuperTokens\Session\Models\RefreshTokenModel;
 
 /**
  * Class RefreshTokenDb
- * @package SuperTokens\Session\Db
+ * @package SuperTokens\SessionHandlingFunctions\Db
  */
 class RefreshTokenDb {
 

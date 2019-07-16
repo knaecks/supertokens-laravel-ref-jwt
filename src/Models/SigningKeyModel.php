@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class SigningKeyModel
- * @package SuperTokens\Session\Models
+ * @package SuperTokens\SessionHandlingFunctions\Models
  * @mixin Builder
  */
 class SigningKeyModel extends Model {

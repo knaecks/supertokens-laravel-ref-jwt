@@ -15,11 +15,11 @@ use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 class SuperToken {
 
     /**
-     * Session constructor.
+     * SessionHandlingFunctions constructor.
      * @throws Exception
      */
     public function __construct() {
-        new Session();
+        new SessionHandlingFunctions();
     }
 
     /**
@@ -27,23 +27,23 @@ class SuperToken {
      * @param $userId
      * @param null $jwtPayload
      * @param null $sessionData
-     * @return SuperTokenSession
+     * @return Session
      * @throws SuperTokensGeneralException
      */
     public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionData = null) {
-        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
 
         Cookie::attachAccessTokenToCookie($response, $newSession['accessToken']['value'], $newSession['accessToken']['expires']);
         Cookie::attachRefreshTokenToCookie($response, $newSession['refreshToken']['value'], $newSession['refreshToken']['expires']);
         Cookie::attachIdRefreshTokenToCookie($response, $newSession['idRefreshToken']['value'], $newSession['idRefreshToken']['expires']);
 
-        return new SuperTokenSession($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
+        return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
     }
 
     /**
      * @param Request $request
      * @param Response $response
-     * @return SuperTokenSession
+     * @return Session
      * @throws SuperTokensGeneralException
      * @throws SuperTokensTryRefreshTokenException
      * @throws SuperTokensUnauthorizedException
@@ -62,11 +62,11 @@ class SuperToken {
         }
 
         try {
-            $newSession = Session::getSession($accessToken);
+            $newSession = SessionHandlingFunctions::getSession($accessToken);
             if (isset($newSession['newAccessToken'])) {
                 Cookie::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);
             }
-            return new SuperTokenSession($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
+            return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
         } catch (SuperTokensUnauthorizedException $e) {
             Cookie::clearSessionFromCookie($response);
             throw $e;
@@ -76,13 +76,12 @@ class SuperToken {
     /**
      * @param Request $request
      * @param Response $response
-     * @return SuperTokenSession
+     * @return Session
      * @throws Exceptions\SuperTokensException
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      * @throws SuperTokensTokenTheftException
-
-     */
+ */
     public static function refreshSession(Request $request, Response $response) {
         $refreshToken = Cookie::getRefreshTokenFromCookie($request);
         $idRefreshToken = Cookie::getIdRefreshTokenFromCookie($request);
@@ -92,13 +91,13 @@ class SuperToken {
         }
 
         try {
-            $newSession = Session::refreshSession($refreshToken);
+            $newSession = SessionHandlingFunctions::refreshSession($refreshToken);
 
             Cookie::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);
             Cookie::attachRefreshTokenToCookie($response, $newSession['newRefreshToken']['value'], $newSession['newRefreshToken']['expires']);
             Cookie::attachIdRefreshTokenToCookie($response, $newSession['newIdRefreshToken']['value'], $newSession['newIdRefreshToken']['expires']);
 
-            return new SuperTokenSession($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
+            return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
         } catch (SuperTokensUnauthorizedException $e) {
             Cookie::clearSessionFromCookie($response);
             throw $e;
@@ -113,7 +112,7 @@ class SuperToken {
      * @throws SuperTokensGeneralException
      */
     public static function revokeAllSessionsForUser($userId) {
-        Session::revokeAllSessionsForUser($userId);
+        SessionHandlingFunctions::revokeAllSessionsForUser($userId);
     }
 
     /**
@@ -121,7 +120,7 @@ class SuperToken {
      * @throws SuperTokensGeneralException
      */
     public static function getAllSessionHandlesForUser($userId) {
-        Session::getAllSessionHandlesForUser($userId);
+        SessionHandlingFunctions::getAllSessionHandlesForUser($userId);
     }
 
     /**
@@ -129,7 +128,7 @@ class SuperToken {
      * @throws SuperTokensGeneralException
      */
     public static function revokeSessionUsingSessionHandle($sessionHandle) {
-        Session::revokeSessionUsingSessionHandle($sessionHandle);
+        SessionHandlingFunctions::revokeSessionUsingSessionHandle($sessionHandle);
     }
 
     /**
@@ -138,7 +137,7 @@ class SuperToken {
      * @throws SuperTokensUnauthorizedException
      */
     public static function getSessionDataForSessionHandle($sessionHandle) {
-        Session::getSessionData($sessionHandle);
+        SessionHandlingFunctions::getSessionData($sessionHandle);
     }
 
     /**
@@ -148,6 +147,6 @@ class SuperToken {
      * @throws SuperTokensUnauthorizedException
      */
     public static function updateSessionDataForSessionHandle($sessionHandle, $newSessionData = null) {
-        Session::updateSessionData($sessionHandle, $newSessionData);
+        SessionHandlingFunctions::updateSessionData($sessionHandle, $newSessionData);
     }
 }

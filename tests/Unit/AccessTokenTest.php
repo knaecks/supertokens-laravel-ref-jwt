@@ -5,10 +5,10 @@ namespace SuperTokens\Session\Tests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Exception;
-use SuperTokens\Session\AccessToken;
+use SuperTokens\Session\Helpers\AccessToken;
 use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 use SuperTokens\Session\Helpers\AccessTokenSigningKey;
-use SuperTokens\Session\Session;
+use SuperTokens\Session\SessionHandlingFunctions;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 
 class AccessTokenTest extends TestCase {
@@ -19,7 +19,7 @@ class AccessTokenTest extends TestCase {
      */
     public function testCreateAndGetInfo() {
         AccessTokenSigningKey::resetInstance();
-        new Session();
+        new SessionHandlingFunctions();
 
         $sessionHandle = "sessionHandle";
         $userId = "userId";
@@ -49,7 +49,7 @@ class AccessTokenTest extends TestCase {
     public function testUserDefinedSingingKeyFunction() {
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.signingKey.get', function () { return "supertokens_testing"; });
-        new Session();
+        new SessionHandlingFunctions();
 
         $key = AccessTokenSigningKey::getKey();
 
@@ -62,7 +62,7 @@ class AccessTokenTest extends TestCase {
     public function testVeryShortUpdateIntervalForSingingKey() {
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.signingKey.updateInterval', 0.0005);
-        new Session();
+        new SessionHandlingFunctions();
 
         $key1 = AccessTokenSigningKey::getKey();
         sleep(2);
@@ -77,7 +77,7 @@ class AccessTokenTest extends TestCase {
     public function testCreateAndGetInfoForAccessTokenWithShortValidity() {
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.validity', 1);
-        new Session();
+        new SessionHandlingFunctions();
 
         $sessionHandle = "sessionHandle";
         $userId = "userId";
@@ -105,7 +105,7 @@ class AccessTokenTest extends TestCase {
     public function testCreateAndGetInfoForAccessTokenWithShortUpdateIntervalSigningKey() {
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.signingKey.updateInterval', 0.0005);
-        new Session();
+        new SessionHandlingFunctions();
 
         $sessionHandle = "sessionHandle";
         $userId = "userId";

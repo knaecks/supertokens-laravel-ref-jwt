@@ -12,7 +12,7 @@ use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\AccessTokenSigningKey;
 use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
-use SuperTokens\Session\Session;
+use SuperTokens\Session\SessionHandlingFunctions;
 use SuperTokens\Session\SuperToken;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 
@@ -431,7 +431,7 @@ class SuperTokensTest extends TestCase {
         $this->assertEquals($session->getUserId(), $userId);
 
         RefreshTokenSigningKey::resetInstance();
-        new Session();
+        new SessionHandlingFunctions();
 
         try {
             $request = new Request([], [], [], [

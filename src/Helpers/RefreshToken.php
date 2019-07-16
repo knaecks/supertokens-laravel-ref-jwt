@@ -1,6 +1,6 @@
 <?php
 
-namespace SuperTokens\Session;
+namespace SuperTokens\Session\Helpers;
 
 use Exception;
 use DateTime;
