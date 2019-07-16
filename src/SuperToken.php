@@ -33,6 +33,7 @@ class SuperToken {
      * @throws SuperTokensGeneralException
      */
     public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionData = null) {
+        CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
 
         CookieAndHeader::attachAccessTokenToCookie($response, $newSession['accessToken']['value'], $newSession['accessToken']['expires']);
@@ -52,6 +53,7 @@ class SuperToken {
      * @throws SuperTokensUnauthorizedException
      */
     public static function getSession(Request $request, Response $response, $enableCsrfProtection) {
+        CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
 
         if (!isset($idRefreshToken) || $idRefreshToken === null) {
@@ -91,6 +93,7 @@ class SuperToken {
      * @throws SuperTokensTokenTheftException
  */
     public static function refreshSession(Request $request, Response $response) {
+        CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $refreshToken = CookieAndHeader::getRefreshTokenFromCookie($request);
         $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
         if (!isset($refreshToken) || !isset($idRefreshToken)) {
@@ -157,5 +160,12 @@ class SuperToken {
      */
     public static function updateSessionDataForSessionHandle($sessionHandle, $newSessionData = null) {
         SessionHandlingFunctions::updateSessionData($sessionHandle, $newSessionData);
+    }
+
+    /**
+     * @param Response $response
+     */
+    public static function setRelevantHeadersForOptionAPI(Response $response) {
+        CookieAndHeader::setOptionsAPIHeader($response);
     }
 }

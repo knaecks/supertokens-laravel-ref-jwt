@@ -16,7 +16,12 @@ define("ANTI_CSRF_HEADER_KEY", "anti-csrf");
 
 class CookieAndHeader {
 
-    private static function setHeader(Response $response, $key, $value) {
+    public static function setOptionsAPIHeader(Response $response) {
+        CookieAndHeader::setHeader($response, "Access-Control-Allow-Headers", ANTI_CSRF_HEADER_KEY);
+        CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
+    }
+
+    public static function setHeader(Response $response, $key, $value) {
         $response->header($key, $value);
     }
 
@@ -31,6 +36,7 @@ class CookieAndHeader {
                 throw SuperTokensException::generateGeneralException("BUG: anti-csrf token is null. if you are getting this error, please report it as bug.");
             }
             CookieAndHeader::setHeader($response, ANTI_CSRF_HEADER_KEY, $value);
+            CookieAndHeader::setHeader($response, "Access-Control-Expose-Headers", ANTI_CSRF_HEADER_KEY);
         }
     }
 
