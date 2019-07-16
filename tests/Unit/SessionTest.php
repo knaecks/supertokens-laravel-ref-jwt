@@ -80,6 +80,68 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
+    public function testCreateAndGetSessionWithDifferentPayloadTypes() {
+        RefreshTokenSigningKey::resetInstance();
+        AccessTokenSigningKey::resetInstance();
+        new Session();
+
+        $userId = "testing";
+        $jwtPayload = [
+            "a" => "testing"
+        ];
+        $sessionData = [
+            "s" => "session"
+        ];
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $sessionInfo = Session::getSession($newSession['accessToken']['value']);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
+        $this->assertEquals(Session::getSessionData($sessionInfo['session']['handle']), $sessionData);
+
+        $jwtPayload = 2;
+        $sessionData = 123;
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $sessionInfo = Session::getSession($newSession['accessToken']['value']);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
+        $this->assertEquals(Session::getSessionData($sessionInfo['session']['handle']), $sessionData);
+
+        $jwtPayload = "hello";
+        $sessionData = "bye";
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $sessionInfo = Session::getSession($newSession['accessToken']['value']);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
+        $this->assertEquals(Session::getSessionData($sessionInfo['session']['handle']), $sessionData);
+
+        $jwtPayload = true;
+        $sessionData = false;
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $sessionInfo = Session::getSession($newSession['accessToken']['value']);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
+        $this->assertEquals(Session::getSessionData($sessionInfo['session']['handle']), $sessionData);
+
+        $jwtPayload = [1, 2, 3, "hi"];
+        $sessionData = [true, 1, 2, "bye", [1, 3, "hi"]];
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $sessionInfo = Session::getSession($newSession['accessToken']['value']);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
+        $this->assertEquals(Session::getSessionData($sessionInfo['session']['handle']), $sessionData);
+
+        $jwtPayload = null;
+        $sessionData = null;
+
+        $newSession = Session::createNewSession($userId, $jwtPayload, $sessionData);
+        $sessionInfo = Session::getSession($newSession['accessToken']['value']);
+        $this->assertEquals($sessionInfo['session']['jwtPayload'], $jwtPayload);
+        $this->assertEquals(Session::getSessionData($sessionInfo['session']['handle']), $sessionData);
+    }
+
+    /**
+     * @throws SuperTokensException | Exception
+     */
     public function testCreateAndGetSessionWhereAccessTokenExpiresAfterOneSec() {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
