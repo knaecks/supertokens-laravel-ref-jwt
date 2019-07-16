@@ -37,6 +37,7 @@ abstract class TestCase extends BaseTestCase {
                     'validity' => 3600,
                     'blacklisting' => false,
                 ],
+                'enableAntiCsrf' => true,
                 'refreshToken' => [
                     'validity' => 2400,
                     'removalCronjobInterval' => '* * 1-31/7 * *',

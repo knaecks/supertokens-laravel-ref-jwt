@@ -6,6 +6,7 @@ namespace SuperTokens\Session;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Config;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Exceptions\SuperTokensTokenTheftException;
 use SuperTokens\Session\Helpers\CookieAndHeader;
@@ -37,7 +38,7 @@ class SuperToken {
         CookieAndHeader::attachAccessTokenToCookie($response, $newSession['accessToken']['value'], $newSession['accessToken']['expires']);
         CookieAndHeader::attachRefreshTokenToCookie($response, $newSession['refreshToken']['value'], $newSession['refreshToken']['expires']);
         CookieAndHeader::attachIdRefreshTokenToCookie($response, $newSession['idRefreshToken']['value'], $newSession['idRefreshToken']['expires']);
-        CookieAndHeader::attachAntiCsrfHeader($response, $newSession['antiCsrfToken']);
+        CookieAndHeader::attachAntiCsrfHeaderIfRequired($response, $newSession['antiCsrfToken']);
 
         return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
     }
@@ -64,6 +65,7 @@ class SuperToken {
         }
 
         try {
+            $enableCsrfProtection = $enableCsrfProtection && Config::get("supertokens.tokens.enableAntiCsrf");
             $antiCsrfToken = $enableCsrfProtection ? CookieAndHeader::getAntiCsrfHeader($request) : null;
             if ($antiCsrfToken === null && $enableCsrfProtection) {
                 throw SuperTokensException::generateTryRefreshTokenException("anti csrf token is missing");
@@ -102,7 +104,7 @@ class SuperToken {
             CookieAndHeader::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);
             CookieAndHeader::attachRefreshTokenToCookie($response, $newSession['newRefreshToken']['value'], $newSession['newRefreshToken']['expires']);
             CookieAndHeader::attachIdRefreshTokenToCookie($response, $newSession['newIdRefreshToken']['value'], $newSession['newIdRefreshToken']['expires']);
-            CookieAndHeader::attachAntiCsrfHeader($response, $newSession['newAntiCsrfToken']);
+            CookieAndHeader::attachAntiCsrfHeaderIfRequired($response, $newSession['newAntiCsrfToken']);
 
             return new Session($newSession['session']['handle'], $newSession['session']['userId'], $newSession['session']['jwtPayload'], $response);
         } catch (SuperTokensUnauthorizedException $e) {

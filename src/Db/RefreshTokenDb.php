@@ -39,6 +39,7 @@ class RefreshTokenDb {
      */
     public static function createNewSessionInDB($sessionHandle, $userId, $refreshTokenHash2, $sessionData, $expiresAt, $jwtPayload) {
         try {
+            $userId = Utils::stringifyUserId($userId);
             $serialisedSessionInfo = Utils::serializeData($sessionData);
             $serialisedJWTPayload = Utils::serializeData($jwtPayload);
             if ($serialisedSessionInfo === false || $serialisedJWTPayload === false) {
@@ -69,7 +70,7 @@ class RefreshTokenDb {
                 return null;
             }
             return [
-                'userId' => $result->user_id,
+                'userId' => Utils::parseUserIdToCorrectFormat($result->user_id),
                 'refreshTokenHash2' => $result->refresh_token_hash_2,
                 'sessionData' => Utils::unserializeData($result->session_info),
                 'expiresAt' => $result->expires_at,
@@ -112,6 +113,7 @@ class RefreshTokenDb {
      */
     public static function getAllSessionHandlesForUser($userId) {
         try {
+            $userId = Utils::stringifyUserId($userId);
             $sessions = RefreshTokenModel::where('user_id', '=', $userId)->get();
             $sessionHandles = [];
             foreach ($sessions as $session) {

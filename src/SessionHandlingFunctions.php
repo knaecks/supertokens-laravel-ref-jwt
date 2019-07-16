@@ -41,9 +41,10 @@ class SessionHandlingFunctions {
      * @throws SuperTokensGeneralException
      */
     public static function createNewSession($userId, $jwtPayload, $sessionData) {
+        Utils::checkUserIdIsStringOrNumber($userId);
         $sessionHandle = Utils::generateSessionHandle();
         $refreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $userId, null);
-        $antiCsrfToken = Utils::generateUUID();
+        $antiCsrfToken = Config::get("supertokens.tokens.enableAntiCsrf") ? Utils::generateUUID() : null;
         $accessToken = AccessToken::createNewAccessToken($sessionHandle, $userId, Utils::hashString($refreshToken['token']), $antiCsrfToken, null, $jwtPayload);
 
         RefreshTokenDb::createNewSessionInDB(
@@ -87,6 +88,7 @@ class SessionHandlingFunctions {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
         $sessionHandle = $accessTokenInfo['sessionHandle'];
 
+        $antiCsrfToken = Config::get("supertokens.tokens.enableAntiCsrf") ? $antiCsrfToken : null;
         if ($antiCsrfToken !== null) {
             if ($antiCsrfToken !== $accessTokenInfo['antiCsrfToken']) {
                 throw SuperTokensException::generateTryRefreshTokenException("anti-csrf check failed");
@@ -218,7 +220,7 @@ class SessionHandlingFunctions {
                 DB::commit();
                 $rollback = false;
                 $newRefreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $refreshTokenInfo['userId'], Utils::hashString($refreshToken));
-                $newAntiCsrfToken = Utils::generateUUID();
+                $newAntiCsrfToken = Config::get("supertokens.tokens.enableAntiCsrf") ? Utils::generateUUID() : null;
                 $newAccessToken = AccessToken::createNewAccessToken(
                     $sessionHandle,
                     $refreshTokenInfo['userId'],

@@ -36,7 +36,7 @@ class AccessToken {
                 }
             }
             $sessionHandle = Utils::sanitizeStringInput($payload['sessionHandle']);
-            $userId = Utils::sanitizeStringInput($payload['userId']);
+            $userId = $payload['userId'];
             $refreshTokenHash1 = Utils::sanitizeStringInput($payload['rt']);
             $expiryTime = Utils::sanitizeNumberInput($payload['expiryTime']);
             $parentRefreshTokenHash1 = Utils::sanitizeStringInput($payload['prt']);
@@ -44,7 +44,7 @@ class AccessToken {
             $userPayload = $payload['userPayload'];
 
             if (!isset($sessionHandle) || !isset($userId) || !isset($refreshTokenHash1) || !isset($expiryTime) ||
-                !isset($antiCsrfToken)) {
+                (!isset($antiCsrfToken) && Config::get("supertokens.tokens.enableAntiCsrf"))) {
                 // it would come here if we change the structure of the JWT.
                 // throw error
                 throw new Exception("invalid access token payload");

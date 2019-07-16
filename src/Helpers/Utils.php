@@ -181,4 +181,48 @@ class Utils {
             throw SuperTokensException::generateGeneralException($e);
         }
     }
+
+    /**
+     * @param $userId
+     * @throws SuperTokensGeneralException
+     */
+    public static function checkUserIdIsStringOrNumber($userId) {
+        if (!is_string($userId) && !is_numeric($userId)) {
+            throw SuperTokensException::generateGeneralException("userId must be a string or a number");
+        }
+    }
+
+    /**
+     * @param $userId
+     * @return string
+     * @throws SuperTokensGeneralException
+     */
+    public static function stringifyUserId($userId) {
+        Utils::checkUserIdIsStringOrNumber($userId);
+        if (is_string($userId)) {
+            $jsonFromUserId = json_decode($userId, true);
+            if ($jsonFromUserId === null) {
+                //  $userId is not a JSON.
+                return $userId;
+            }
+            if (count($jsonFromUserId) === 1 && $jsonFromUserId["i"] !== null) {
+                throw SuperTokensException::generateGeneralException("passed userId cannot be stringified version of object type {i: string}");
+            }
+            return $userId;
+        }
+        return json_encode([
+            "i" => $userId
+        ]);
+    }
+
+    public static function parseUserIdToCorrectFormat($userId) {
+        $id = json_decode($userId, true);
+        if ($id === null || !is_array($id)) {
+            return $userId;
+        }
+        if (count($id) !== 1 || $id["i"] === null) {
+            return $userId;
+        }
+        return $id["i"];
+    }
 }
