@@ -84,7 +84,7 @@ class SessionHandlingFunctions {
      * @return array
      * @throws SuperTokensGeneralException | SuperTokensUnauthorizedException | SuperTokensTryRefreshTokenException
      */
-    public static function getSession($accessToken, $antiCsrfToken) {
+    public static function getSession($accessToken, $antiCsrfToken = null) {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
         $sessionHandle = $accessTokenInfo['sessionHandle'];
 

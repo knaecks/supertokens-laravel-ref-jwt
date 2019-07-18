@@ -201,11 +201,11 @@ class Utils {
         Utils::checkUserIdIsStringOrNumber($userId);
         if (is_string($userId)) {
             $jsonFromUserId = json_decode($userId, true);
-            if ($jsonFromUserId === null) {
+            if ($jsonFromUserId === null || is_numeric($jsonFromUserId)) {
                 //  $userId is not a JSON.
                 return $userId;
             }
-            if (count($jsonFromUserId) === 1 && $jsonFromUserId["i"] !== null) {
+            if (count($jsonFromUserId) === 1 && array_key_exists("i", $jsonFromUserId)) {
                 throw SuperTokensException::generateGeneralException("passed userId cannot be stringified version of object type {i: string}");
             }
             return $userId;
