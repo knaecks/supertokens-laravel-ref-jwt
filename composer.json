@@ -1,13 +1,14 @@
 {
     "name": "supertokens/supertokens-laravel-ref-jwt",
+    "version": "0.0.2",
     "description": "Implementation of session management using Laravel framework with JWT and refresh tokens",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
     "require": {
         "ramsey/uuid": "3.8.0",
-        "illuminate/database": "^5.9@dev",
-        "illuminate/http": "^5.9@dev",
+        "illuminate/database": "^5.8",
+        "illuminate/http": "^5.8",
         "ext-json": "^1.6",
         "ext-openssl": "^7.2"
     },
@@ -29,6 +30,6 @@
         }
     },
     "require-dev": {
-        "orchestra/testbench": "^3.10@dev"
+        "orchestra/testbench": "^3.8"
     }
 }
