@@ -38,6 +38,9 @@ class SuperTokensServiceProvider extends ServiceProvider {
         $this->publishes([
             __DIR__.'/../../config/supertokens.php' => config_path('supertokens.php')
         ], 'supertokens-config');
+        $this->publishes([
+            __DIR__.'/../../database/migrations/' => database_path('migrations')
+        ], 'supertokens-migrations');
     }
 
     private function registerFacades() {
