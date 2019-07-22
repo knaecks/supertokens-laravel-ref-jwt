@@ -1,6 +1,6 @@
 {
     "name": "supertokens/supertokens-laravel-ref-jwt",
-    "version": "0.0.4",
+    "version": "1.0.0",
     "description": "Implementation of session management using Laravel framework with JWT and refresh tokens",
     "type": "library",
     "license": "MIT",

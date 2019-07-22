@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Models\RefreshTokenModel;
 use SuperTokens\Session\SuperToken;
+use Exception;
 
 class SuperTokensServiceProvider extends ServiceProvider {
     /**
@@ -31,7 +32,7 @@ class SuperTokensServiceProvider extends ServiceProvider {
 
     private function registerResources() {
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
-        $this->registerFacades();
+        $this->registerSingleton();
     }
 
     private function registerPublishing() {
@@ -43,7 +44,7 @@ class SuperTokensServiceProvider extends ServiceProvider {
         ], 'supertokens-migrations');
     }
 
-    private function registerFacades() {
+    private function registerSingleton() {
         $this->app->singleton("SuperTokens", function ($app) {
             return new SuperToken();
         });
