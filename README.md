@@ -12,7 +12,7 @@
 
 This library implements user session management for websites that run on **Laravel**. This is meant to be used with your backend code. If you do not use Laravel, please checkout [our website](https://supertokens.io) to find the right library for you..
 
-#### The protocol SuperTokens uses is described in detail in [this article](https://medium.com/hackernoon/the-best-way-to-securely-manage-user-sessions-91f27eeef460)
+#### The protocol SuperTokens uses is described in detail in [this article](https://supertokens.io/blog/the-best-way-to-securely-manage-user-sessions)
 
 The library has the following features:
 - It uses short-lived access tokens (JWT) and long-lived refresh tokens (Opaque).
