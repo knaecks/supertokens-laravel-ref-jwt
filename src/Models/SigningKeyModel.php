@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 class SigningKeyModel extends Model {
     protected $table = "signing_key";
 
+    protected $primaryKey = 'key_name';
+
+    public $incrementing = false;
+
     protected $fillable = ['key_name', 'key_value', 'created_at_time'];
 
     public $timestamps = false;

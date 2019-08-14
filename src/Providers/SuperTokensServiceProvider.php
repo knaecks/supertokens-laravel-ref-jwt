@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use SuperTokens\Session\Helpers\Utils;
-use SuperTokens\Session\Models\RefreshTokenModel;
+use SuperTokens\Session\Db\RefreshTokenDb;
 use SuperTokens\Session\SuperToken;
 use Exception;
 
@@ -55,9 +55,8 @@ class SuperTokensServiceProvider extends ServiceProvider {
         $this->app->booted(function () {
             $schedule = app(Schedule::class);
             $schedule->call(function () {
-                $currentTimestamp = Utils::getDateTimeStamp();
                 try {
-                    RefreshTokenModel::where('expires_at', '<=', $currentTimestamp)->delete();
+                    RefreshTokenDb::removeOldSessions();
                 } catch (Exception $e) {
                     /* we ignore the error */
                 }

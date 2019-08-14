@@ -180,4 +180,16 @@ class RefreshTokenDb {
             throw SuperTokensException::generateGeneralException($e);
         }
     }
+
+    /**
+     *
+     */
+    public static function removeOldSessions() {
+        try {
+            $currentTimestamp = Utils::getDateTimeStamp();
+            return RefreshTokenModel::where('expires_at', '<=', $currentTimestamp)->delete();
+        } catch (Exception $e) {
+            throw SuperTokensException::generateGeneralException($e);
+        }
+    }
 }

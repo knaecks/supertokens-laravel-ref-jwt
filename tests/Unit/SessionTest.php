@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Config;
 use SuperTokens\Session\Helpers\AccessTokenSigningKey;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Models\RefreshTokenModel;
+use SuperTokens\Session\Db\RefreshTokenDb;
 
 class SessionTest extends TestCase {
     use RefreshDatabase;
@@ -1050,7 +1051,7 @@ class SessionTest extends TestCase {
         $noOfRows = RefreshTokenModel::all()->count();
         $this->assertEquals($noOfRows, 2);
 
-        SessionHandlingFunctions::revokeSessionUsingSessionHandle($newSession['session']['handle']);
+        $this->assertEquals(SessionHandlingFunctions::revokeSessionUsingSessionHandle($newSession['session']['handle']), 1);
         $noOfRows = RefreshTokenModel::all()->count();
         $this->assertEquals($noOfRows, 1);
 
@@ -1100,7 +1101,7 @@ class SessionTest extends TestCase {
         $noOfRows = RefreshTokenModel::all()->count();
         $this->assertEquals($noOfRows, 2);
 
-        SessionHandlingFunctions::revokeSessionUsingSessionHandle($newSession1['session']['handle']);
+        $this->assertEquals(SessionHandlingFunctions::revokeSessionUsingSessionHandle($newSession1['session']['handle']), 1);
         $noOfRows = RefreshTokenModel::all()->count();
         $this->assertEquals($noOfRows, 1);
 
@@ -1226,5 +1227,34 @@ class SessionTest extends TestCase {
             $this->assertEquals($e->getUserId(), $userId);
             $this->assertEquals($e->getSessionHandle(), $newSession['session']['handle']);
         }
+    }
+
+    /**
+     * @throws SuperTokensException | Exception
+     */
+    public function testRemoveExpiredSessions() {
+        RefreshTokenSigningKey::resetInstance();
+        AccessTokenSigningKey::resetInstance();
+        Config::set('supertokens.tokens.refreshToken.validity', 0.0008);
+        new SessionHandlingFunctions();
+
+        $userId = "testing";
+        $jwtPayload = [
+            "a" => "testing"
+        ];
+        $sessionData = [
+            "s" => "session"
+        ];
+
+        SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
+        SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
+        SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
+        $noOfRows = RefreshTokenModel::all()->count();
+        $this->assertEquals($noOfRows, 3);
+        sleep(4);
+        SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
+        RefreshTokenDb::removeOldSessions();
+        $noOfRows = RefreshTokenModel::all()->count();
+        $this->assertEquals($noOfRows, 1);
     }
 }

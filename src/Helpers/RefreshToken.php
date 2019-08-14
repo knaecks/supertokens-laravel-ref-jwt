@@ -84,6 +84,6 @@ class RefreshToken {
     }
 
     public static function getValidity() {
-        return Config::get('supertokens.tokens.refreshToken.validity') * 60 * 60;
+        return (int)(Config::get('supertokens.tokens.refreshToken.validity') * 60 * 60);
     }
 }
