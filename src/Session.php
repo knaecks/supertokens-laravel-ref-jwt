@@ -46,8 +46,9 @@ class Session {
      * @throws SuperTokensGeneralException
      */
     public function revokeSession() {
-        SuperToken::revokeSessionUsingSessionHandle($this->sessionHandle);
-        CookieAndHeader::clearSessionFromCookie($this->response);
+        if (SuperToken::revokeSessionUsingSessionHandle($this->sessionHandle)) {
+            CookieAndHeader::clearSessionFromCookie($this->response);
+        }
     }
 
     /**
