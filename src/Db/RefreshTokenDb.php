@@ -34,25 +34,25 @@ class RefreshTokenDb
      * @param $sessionHandle
      * @param $userId
      * @param $refreshTokenHash2
-     * @param $sessionData
+     * @param $sessionInfo
      * @param $expiresAt
      * @param $jwtPayload
      * @throws SuperTokensGeneralException
      */
-    public static function createNewSessionInDB($sessionHandle, $userId, $refreshTokenHash2, $sessionData, $expiresAt, $jwtPayload)
+    public static function createNewSessionInDB($sessionHandle, $userId, $refreshTokenHash2, $sessionInfo, $expiresAt, $jwtPayload)
     {
         try {
             $userId = Utils::stringifyUserId($userId);
-            $serialisedSessionInfo = Utils::serializeData($sessionData);
+            $serialisedSessionObject = Utils::serializeData($sessionInfo);
             $serialisedJWTPayload = Utils::serializeData($jwtPayload);
-            if ($serialisedSessionInfo === false || $serialisedJWTPayload === false) {
+            if ($serialisedSessionObject === false || $serialisedJWTPayload === false) {
                 throw new Exception("unable to serialised user provided payload");
             }
             $sessionForDb = new RefreshTokenModel;
             $sessionForDb->session_handle = $sessionHandle;
             $sessionForDb->user_id = $userId;
             $sessionForDb->refresh_token_hash_2 = $refreshTokenHash2;
-            $sessionForDb->session_info = $serialisedSessionInfo;
+            $sessionForDb->session_info = $serialisedSessionObject;
             $sessionForDb->expires_at = $expiresAt;
             $sessionForDb->jwt_user_payload = $serialisedJWTPayload;
             $sessionForDb->save();
@@ -66,7 +66,7 @@ class RefreshTokenDb
      * @return array|null
      * @throws SuperTokensGeneralException
      */
-    public static function getSessionInfoForUpdate($sessionHandle)
+    public static function getSessionObjectForUpdate($sessionHandle)
     {
         try {
             $result = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->lockForUpdate()->first();
@@ -76,7 +76,7 @@ class RefreshTokenDb
             return [
                 'userId' => Utils::parseUserIdToCorrectFormat($result->user_id),
                 'refreshTokenHash2' => $result->refresh_token_hash_2,
-                'sessionData' => Utils::unserializeData($result->session_info),
+                'sessionInfo' => Utils::unserializeData($result->session_info),
                 'expiresAt' => $result->expires_at,
                 'jwtPayload' => Utils::unserializeData($result->jwt_user_payload),
             ];
@@ -88,22 +88,22 @@ class RefreshTokenDb
     /**
      * @param $sessionHandle
      * @param $refreshTokenHash2
-     * @param $sessionData
+     * @param $sessionInfo
      * @param $expiresAt
      * @return int
      * @throws SuperTokensGeneralException
      */
-    public static function updateSessionInfo_Transaction($sessionHandle, $refreshTokenHash2, $sessionData, $expiresAt)
+    public static function updateSessionObject_Transaction($sessionHandle, $refreshTokenHash2, $sessionInfo, $expiresAt)
     {
         try {
-            $serialisedSessionInfo = Utils::serializeData($sessionData);
-            if ($serialisedSessionInfo === false) {
+            $serialisedSessionObject = Utils::serializeData($sessionInfo);
+            if ($serialisedSessionObject === false) {
                 throw new Exception("unable to serialised user provided payload");
             }
             return RefreshTokenModel::where('session_handle', '=', $sessionHandle)
                 ->update([
                     'refresh_token_hash_2' => $refreshTokenHash2,
-                    'session_info' => $serialisedSessionInfo,
+                    'session_info' => $serialisedSessionObject,
                     'expires_at' => $expiresAt
                 ]);
         } catch (Exception $e) {
@@ -150,7 +150,7 @@ class RefreshTokenDb
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function getSessionData($sessionHandle)
+    public static function getSessionInfo($sessionHandle)
     {
         try {
             $session = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->first();
@@ -170,20 +170,20 @@ class RefreshTokenDb
 
     /**
      * @param $sessionHandle
-     * @param $sessionData
+     * @param $sessionInfo
      * @return int
      * @throws SuperTokensGeneralException
      */
-    public static function updateSessionData($sessionHandle, $sessionData)
+    public static function updateSessionInfo($sessionHandle, $sessionInfo)
     {
         try {
-            $serialisedSessionInfo = Utils::serializeData($sessionData);
-            if ($serialisedSessionInfo === false) {
+            $serialisedSessionObject = Utils::serializeData($sessionInfo);
+            if ($serialisedSessionObject === false) {
                 throw new Exception("unable to serialised user provided payload");
             }
             return RefreshTokenModel::where('session_handle', '=', $sessionHandle)
                 ->update([
-                    'session_info' => $serialisedSessionInfo
+                    'session_info' => $serialisedSessionObject
                 ]);
         } catch (Exception $e) {
             throw SuperTokensException::generateGeneralException($e);

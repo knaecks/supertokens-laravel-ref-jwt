@@ -38,7 +38,7 @@ class SuperTokensTest extends TestCase
         $jwtPayload = [
             "a" => "testing"
         ];
-        $sessionData = [
+        $sessionInfo = [
             "s" => "session"
         ];
 
@@ -52,7 +52,7 @@ class SuperTokensTest extends TestCase
 
         $response = new Response();
 
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
 
         $cookies = $response->headers->getCookies();
         $antiCsrfToken = $response->headers->get('anti-csrf');
@@ -244,7 +244,7 @@ class SuperTokensTest extends TestCase
         $jwtPayload = [
             "a" => "testing"
         ];
-        $sessionData = [
+        $sessionInfo = [
             "s" => "session"
         ];
 
@@ -258,7 +258,7 @@ class SuperTokensTest extends TestCase
 
         $response = new Response();
 
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
 
         $cookies = $response->headers->getCookies();
         $this->assertEquals(count($cookies), 3);
@@ -418,7 +418,7 @@ class SuperTokensTest extends TestCase
         $jwtPayload = [
             "a" => "testing"
         ];
-        $sessionData = [
+        $sessionInfo = [
             "s" => "session"
         ];
 
@@ -432,7 +432,7 @@ class SuperTokensTest extends TestCase
 
         $response = new Response();
 
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
 
         $cookies = $response->headers->getCookies();
         $antiCsrfToken = $response->headers->get('anti-csrf');
@@ -508,7 +508,7 @@ class SuperTokensTest extends TestCase
         $jwtPayload = [
             "a" => "testing"
         ];
-        $sessionData = [
+        $sessionInfo = [
             "s" => "session"
         ];
 
@@ -522,7 +522,7 @@ class SuperTokensTest extends TestCase
 
         $response = new Response();
 
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
 
         $cookies = $response->headers->getCookies();
         $antiCsrfToken = $response->headers->get('anti-csrf');
@@ -601,7 +601,7 @@ class SuperTokensTest extends TestCase
         $jwtPayload = [
             "a" => "testing"
         ];
-        $sessionData = [
+        $sessionInfo = [
             "s" => "session"
         ];
 
@@ -615,7 +615,7 @@ class SuperTokensTest extends TestCase
 
         $response = new Response();
 
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
 
         $cookies = $response->headers->getCookies();
         $antiCsrfToken = $response->headers->get('anti-csrf');
@@ -714,7 +714,7 @@ class SuperTokensTest extends TestCase
         $jwtPayload = [
             "a" => "testing"
         ];
-        $sessionData = [
+        $sessionInfo = [
             "s" => "session"
         ];
 
@@ -727,7 +727,7 @@ class SuperTokensTest extends TestCase
         $sIdRefreshTokenCookieFound = false;
 
         $response = new Response();
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
         $cookies = $response->headers->getCookies();
         $antiCsrfToken1 = $response->headers->get('anti-csrf');
         $this->assertEquals(count($cookies), 3);
@@ -761,7 +761,7 @@ class SuperTokensTest extends TestCase
         $sIdRefreshTokenCookie2 = null;
 
         $response = new Response();
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
         $cookies = $response->headers->getCookies();
         $antiCsrfToken2 = $response->headers->get('anti-csrf');
         $this->assertEquals(count($cookies), 3);
@@ -866,7 +866,7 @@ class SuperTokensTest extends TestCase
         $jwtPayload = [
             "a" => "testing"
         ];
-        $sessionData = [
+        $sessionInfo = [
             "s" => "session"
         ];
 
@@ -879,7 +879,7 @@ class SuperTokensTest extends TestCase
         $sIdRefreshTokenCookieFound = false;
 
         $response = new Response();
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
         $cookies = $response->headers->getCookies();
         $antiCsrfToken1 = $response->headers->get('anti-csrf');
         $this->assertEquals(count($cookies), 3);
@@ -913,7 +913,7 @@ class SuperTokensTest extends TestCase
         $sIdRefreshTokenCookie2 = null;
 
         $response = new Response();
-        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionData);
+        SuperToken::createNewSession($response, $userId, $jwtPayload, $sessionInfo);
         $cookies = $response->headers->getCookies();
         $antiCsrfToken2 = $response->headers->get('anti-csrf');
         $this->assertEquals(count($cookies), 3);

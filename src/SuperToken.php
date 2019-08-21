@@ -29,14 +29,14 @@ class SuperToken
      * @param Response $response
      * @param $userId
      * @param null $jwtPayload
-     * @param null $sessionData
+     * @param null $sessionInfo
      * @return Session
      * @throws SuperTokensGeneralException
      */
-    public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionData = null)
+    public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionInfo = null)
     {
         CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
-        $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
+        $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionInfo);
 
         CookieAndHeader::attachAccessTokenToCookie($response, $newSession['accessToken']['value'], $newSession['accessToken']['expires']);
         CookieAndHeader::attachRefreshTokenToCookie($response, $newSession['refreshToken']['value'], $newSession['refreshToken']['expires']);
@@ -155,20 +155,20 @@ class SuperToken
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public static function getSessionDataForSessionHandle($sessionHandle)
+    public static function getSessionInfoForSessionHandle($sessionHandle)
     {
-        SessionHandlingFunctions::getSessionData($sessionHandle);
+        SessionHandlingFunctions::getSessionInfo($sessionHandle);
     }
 
     /**
      * @param $sessionHandle
-     * @param null $newSessionData
+     * @param null $newSessionInfo
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public static function updateSessionDataForSessionHandle($sessionHandle, $newSessionData = null)
+    public static function updateSessionInfoForSessionHandle($sessionHandle, $newSessionInfo = null)
     {
-        SessionHandlingFunctions::updateSessionData($sessionHandle, $newSessionData);
+        SessionHandlingFunctions::updateSessionInfo($sessionHandle, $newSessionInfo);
     }
 
     /**

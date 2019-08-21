@@ -38,11 +38,11 @@ class SessionHandlingFunctions
     /**
      * @param $userId
      * @param $jwtPayload
-     * @param $sessionData
+     * @param $sessionInfo
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function createNewSession($userId, $jwtPayload, $sessionData)
+    public static function createNewSession($userId, $jwtPayload, $sessionInfo)
     {
         Utils::checkUserIdIsStringOrNumber($userId);
         $sessionHandle = Utils::generateSessionHandle();
@@ -54,7 +54,7 @@ class SessionHandlingFunctions
             $sessionHandle,
             $userId,
             Utils::hashString(Utils::hashString($refreshToken['token'])),
-            $sessionData,
+            $sessionInfo,
             $refreshToken['expiry'],
             $jwtPayload
         );
@@ -122,24 +122,24 @@ class SessionHandlingFunctions
         try {
             DB::beginTransaction();
             $rollback = true;
-            $sessionInfo = RefreshTokenDb::getSessionInfoForUpdate($sessionHandle);
-            if (!isset($sessionInfo)) {
+            $sessionObject = RefreshTokenDb::getSessionObjectForUpdate($sessionHandle);
+            if (!isset($sessionObject)) {
                 DB::commit();
                 $rollback = false;
                 throw SuperTokensException::generateUnauthorisedException("missing session in db");
             }
 
-            $promote = $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['parentRefreshTokenHash1']);
-            if ($promote || $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['refreshTokenHash1'])) {
+            $promote = $sessionObject['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['parentRefreshTokenHash1']);
+            if ($promote || $sessionObject['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['refreshTokenHash1'])) {
                 if ($promote) {
                     $validity = RefreshToken::getValidity();
                     $date = new DateTime();
                     $currentTimestamp = $date->getTimestamp();
                     $expiresAt = $currentTimestamp + $validity;
-                    RefreshTokenDb::updateSessionInfo_Transaction(
+                    RefreshTokenDb::updateSessionObject_Transaction(
                         $sessionHandle,
                         Utils::hashString($accessTokenInfo['refreshTokenHash1']),
-                        $sessionInfo['sessionData'],
+                        $sessionObject['sessionInfo'],
                         $expiresAt
                     );
                 }
@@ -206,22 +206,22 @@ class SessionHandlingFunctions
             DB::beginTransaction();
             $rollback = true;
 
-            $sessionInfo = RefreshTokenDb::getSessionInfoForUpdate($sessionHandle);
+            $sessionObject = RefreshTokenDb::getSessionObjectForUpdate($sessionHandle);
             $date = new DateTime();
             $currentTimestamp = $date->getTimestamp();
-            if (!isset($sessionInfo) || $sessionInfo['expiresAt'] < $currentTimestamp) {
+            if (!isset($sessionObject) || $sessionObject['expiresAt'] < $currentTimestamp) {
                 DB::commit();
                 $rollback = false;
                 throw SuperTokensException::generateUnauthorisedException("session does not exist or has expired");
             }
 
-            if ($sessionInfo['userId'] !== $refreshTokenInfo['userId']) {
+            if ($sessionObject['userId'] !== $refreshTokenInfo['userId']) {
                 DB::commit();
                 $rollback = false;
                 throw SuperTokensException::generateUnauthorisedException("userId for session does not match the userId in the refresh token");
             }
 
-            if ($sessionInfo['refreshTokenHash2'] === Utils::hashString(Utils::hashString($refreshToken))) {
+            if ($sessionObject['refreshTokenHash2'] === Utils::hashString(Utils::hashString($refreshToken))) {
                 DB::commit();
                 $rollback = false;
                 $newRefreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $refreshTokenInfo['userId'], Utils::hashString($refreshToken));
@@ -232,13 +232,13 @@ class SessionHandlingFunctions
                     Utils::hashString($newRefreshToken['token']),
                     $newAntiCsrfToken,
                     Utils::hashString($refreshToken),
-                    $sessionInfo['jwtPayload']
+                    $sessionObject['jwtPayload']
                 );
                 return [
                     'session' => [
                         'handle' => $sessionHandle,
                         'userId' => $refreshTokenInfo['userId'],
-                        'jwtPayload' => $sessionInfo['jwtPayload'],
+                        'jwtPayload' => $sessionObject['jwtPayload'],
                     ],
                     'newAccessToken' => [
                         'value' => $newAccessToken['token'],
@@ -258,7 +258,7 @@ class SessionHandlingFunctions
 
             if (
                 isset($refreshTokenInfo['parentRefreshTokenHash1']) &&
-                Utils::hashString($refreshTokenInfo['parentRefreshTokenHash1']) === $sessionInfo['refreshTokenHash2']
+                Utils::hashString($refreshTokenInfo['parentRefreshTokenHash1']) === $sessionObject['refreshTokenHash2']
             ) {
                 // At this point, the input refresh token is a child and its parent is in the database. Normally, this part of the code
                 // will be reached only when the client uses a refresh token to request a new refresh token before
@@ -274,10 +274,10 @@ class SessionHandlingFunctions
                 $date = new DateTime();
                 $currentTimestamp = $date->getTimestamp();
                 $expiresAt = $currentTimestamp + $validity;
-                RefreshTokenDb::updateSessionInfo_Transaction(
+                RefreshTokenDb::updateSessionObject_Transaction(
                     $sessionHandle,
                     Utils::hashString(Utils::hashString($refreshToken)),
-                    $sessionInfo['sessionData'],
+                    $sessionObject['sessionInfo'],
                     $expiresAt
                 );
                 DB::commit();
@@ -288,7 +288,7 @@ class SessionHandlingFunctions
 
             DB::commit();
             $rollback = false;
-            throw SuperTokensException::generateTokenTheftException($sessionInfo['userId'], $sessionHandle);
+            throw SuperTokensException::generateTokenTheftException($sessionObject['userId'], $sessionHandle);
         } catch (Exception $e) {
             if ($rollback) {
                 DB::rollBack();
@@ -341,9 +341,9 @@ class SessionHandlingFunctions
      * @throws Exception
      * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
-    public static function getSessionData($sessionHandle)
+    public static function getSessionInfo($sessionHandle)
     {
-        $result = RefreshTokenDb::getSessionData($sessionHandle);
+        $result = RefreshTokenDb::getSessionInfo($sessionHandle);
         if (!$result['found']) {
             throw SuperTokensException::generateUnauthorisedException("session does not exist anymore");
         }
@@ -352,12 +352,12 @@ class SessionHandlingFunctions
 
     /**
      * @param $sessionHandle
-     * @param $newSessionData
+     * @param $newSessionInfo
      * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
-    public static function updateSessionData($sessionHandle, $newSessionData)
+    public static function updateSessionInfo($sessionHandle, $newSessionInfo)
     {
-        $affected = RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
+        $affected = RefreshTokenDb::updateSessionInfo($sessionHandle, $newSessionInfo);
         if ($affected !== 1) {
             throw SuperTokensException::generateUnauthorisedException("session does not exist anymore");
         }

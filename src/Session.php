@@ -59,10 +59,10 @@ class Session
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public function getSessionData()
+    public function getSessionInfo()
     {
         try {
-            return SessionHandlingFunctions::getSessionData($this->sessionHandle);
+            return SessionHandlingFunctions::getSessionInfo($this->sessionHandle);
         } catch (SuperTokensUnauthorizedException $e) {
             CookieAndHeader::clearSessionFromCookie($this->response);
             throw $e;
@@ -70,14 +70,14 @@ class Session
     }
 
     /**
-     * @param $newSessionData
+     * @param $newSessionInfo
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public function updateSessionData($newSessionData)
+    public function updateSessionInfo($newSessionInfo)
     {
         try {
-            SessionHandlingFunctions::updateSessionData($this->sessionHandle, $newSessionData);
+            SessionHandlingFunctions::updateSessionInfo($this->sessionHandle, $newSessionInfo);
         } catch (SuperTokensUnauthorizedException $e) {
             CookieAndHeader::clearSessionFromCookie($this->response);
             throw $e;
