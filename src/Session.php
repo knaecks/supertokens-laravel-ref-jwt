@@ -7,7 +7,8 @@ use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\CookieAndHeader;
 
-class Session {
+class Session
+{
     /**
      * @var
      */
@@ -35,7 +36,8 @@ class Session {
      * @param $jwtUserPayload
      * @param $response
      */
-    public function __construct($sessionHandle, $userId, $jwtUserPayload, $response) {
+    public function __construct($sessionHandle, $userId, $jwtUserPayload, $response)
+    {
         $this->sessionHandle = $sessionHandle;
         $this->userId = $userId;
         $this->jwtUserPayload = $jwtUserPayload;
@@ -45,7 +47,8 @@ class Session {
     /**
      * @throws SuperTokensGeneralException
      */
-    public function revokeSession() {
+    public function revokeSession()
+    {
         if (SuperToken::revokeSessionUsingSessionHandle($this->sessionHandle)) {
             CookieAndHeader::clearSessionFromCookie($this->response);
         }
@@ -56,7 +59,8 @@ class Session {
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public function getSessionData() {
+    public function getSessionData()
+    {
         try {
             return SessionHandlingFunctions::getSessionData($this->sessionHandle);
         } catch (SuperTokensUnauthorizedException $e) {
@@ -70,7 +74,8 @@ class Session {
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public function updateSessionData($newSessionData) {
+    public function updateSessionData($newSessionData)
+    {
         try {
             SessionHandlingFunctions::updateSessionData($this->sessionHandle, $newSessionData);
         } catch (SuperTokensUnauthorizedException $e) {
@@ -82,15 +87,16 @@ class Session {
     /**
      * @return string
      */
-    public function getUserId() {
+    public function getUserId()
+    {
         return $this->userId;
     }
 
     /**
      * @return mixed
      */
-    public function getJWTPayload() {
+    public function getJWTPayload()
+    {
         return $this->jwtUserPayload;
     }
-
 }

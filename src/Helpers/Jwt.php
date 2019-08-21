@@ -1,14 +1,17 @@
 <?php
 
 namespace SuperTokens\Session\Helpers;
+
 use Exception;
 
-class Jwt {
+class Jwt
+{
 
     /**
      * @return string
      */
-    protected static function getHeader() {
+    protected static function getHeader()
+    {
         return base64_encode(json_encode([
             'alg' => 'HS256',
             'typ' => 'JWT'
@@ -20,7 +23,8 @@ class Jwt {
      * @param $signingKey
      * @return string
      */
-    public static function createJWT($plainTextPayload, $signingKey) {
+    public static function createJWT($plainTextPayload, $signingKey)
+    {
         $header = Jwt::getHeader();
         $payload = base64_encode(json_encode($plainTextPayload));
         $signature = Utils::hmac($header.".".$payload, $signingKey);
@@ -33,7 +37,8 @@ class Jwt {
      * @return mixed
      * @throws Exception
      */
-    public static function verifyJWTAndGetPayload($jwt, $signingKey) {
+    public static function verifyJWTAndGetPayload($jwt, $signingKey)
+    {
         $splittedInput = explode(".", $jwt);
         $header = Jwt::getHeader();
 

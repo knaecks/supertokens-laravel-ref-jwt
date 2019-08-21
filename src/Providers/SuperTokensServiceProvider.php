@@ -10,13 +10,15 @@ use SuperTokens\Session\Db\RefreshTokenDb;
 use SuperTokens\Session\SuperToken;
 use Exception;
 
-class SuperTokensServiceProvider extends ServiceProvider {
+class SuperTokensServiceProvider extends ServiceProvider
+{
     /**
      * Register bindings in the container.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
     }
 
     /**
@@ -24,18 +26,21 @@ class SuperTokensServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         $this->registerResources();
         $this->registerPublishing();
         $this->registerScheduler();
     }
 
-    private function registerResources() {
+    private function registerResources()
+    {
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         $this->registerSingleton();
     }
 
-    private function registerPublishing() {
+    private function registerPublishing()
+    {
         $this->publishes([
             __DIR__.'/../../config/supertokens.php' => config_path('supertokens.php')
         ], 'supertokens-config');
@@ -44,14 +49,16 @@ class SuperTokensServiceProvider extends ServiceProvider {
         ], 'supertokens-migrations');
     }
 
-    private function registerSingleton() {
+    private function registerSingleton()
+    {
         $this->app->singleton("SuperTokens", function ($app) {
             return new SuperToken();
         });
     }
 
     // TODO: test that this cron job is running.
-    private function registerScheduler() {
+    private function registerScheduler()
+    {
         $this->app->booted(function () {
             $schedule = app(Schedule::class);
             $schedule->call(function () {

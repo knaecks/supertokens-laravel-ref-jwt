@@ -2,7 +2,6 @@
 
 namespace SuperTokens\Session;
 
-
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,13 +13,15 @@ use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Exceptions\SuperTokensTryRefreshTokenException;
 
-class SuperToken {
+class SuperToken
+{
 
     /**
      * SessionHandlingFunctions constructor.
      * @throws Exception
      */
-    public function __construct() {
+    public function __construct()
+    {
         new SessionHandlingFunctions();
     }
 
@@ -32,7 +33,8 @@ class SuperToken {
      * @return Session
      * @throws SuperTokensGeneralException
      */
-    public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionData = null) {
+    public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionData = null)
+    {
         CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionData);
 
@@ -52,7 +54,8 @@ class SuperToken {
      * @throws SuperTokensTryRefreshTokenException
      * @throws SuperTokensUnauthorizedException
      */
-    public static function getSession(Request $request, Response $response, $enableCsrfProtection) {
+    public static function getSession(Request $request, Response $response, $enableCsrfProtection)
+    {
         CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
 
@@ -92,7 +95,8 @@ class SuperToken {
      * @throws SuperTokensUnauthorizedException
      * @throws SuperTokensTokenTheftException
  */
-    public static function refreshSession(Request $request, Response $response) {
+    public static function refreshSession(Request $request, Response $response)
+    {
         CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $refreshToken = CookieAndHeader::getRefreshTokenFromCookie($request);
         $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
@@ -123,7 +127,8 @@ class SuperToken {
      * @param $userId
      * @throws SuperTokensGeneralException
      */
-    public static function revokeAllSessionsForUser($userId) {
+    public static function revokeAllSessionsForUser($userId)
+    {
         SessionHandlingFunctions::revokeAllSessionsForUser($userId);
     }
 
@@ -131,7 +136,8 @@ class SuperToken {
      * @param $userId
      * @throws SuperTokensGeneralException
      */
-    public static function getAllSessionHandlesForUser($userId) {
+    public static function getAllSessionHandlesForUser($userId)
+    {
         SessionHandlingFunctions::getAllSessionHandlesForUser($userId);
     }
 
@@ -139,7 +145,8 @@ class SuperToken {
      * @param $sessionHandle
      * @throws SuperTokensGeneralException
      */
-    public static function revokeSessionUsingSessionHandle($sessionHandle) {
+    public static function revokeSessionUsingSessionHandle($sessionHandle)
+    {
         SessionHandlingFunctions::revokeSessionUsingSessionHandle($sessionHandle);
     }
 
@@ -148,7 +155,8 @@ class SuperToken {
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public static function getSessionDataForSessionHandle($sessionHandle) {
+    public static function getSessionDataForSessionHandle($sessionHandle)
+    {
         SessionHandlingFunctions::getSessionData($sessionHandle);
     }
 
@@ -158,14 +166,16 @@ class SuperToken {
      * @throws SuperTokensGeneralException
      * @throws SuperTokensUnauthorizedException
      */
-    public static function updateSessionDataForSessionHandle($sessionHandle, $newSessionData = null) {
+    public static function updateSessionDataForSessionHandle($sessionHandle, $newSessionData = null)
+    {
         SessionHandlingFunctions::updateSessionData($sessionHandle, $newSessionData);
     }
 
     /**
      * @param Response $response
      */
-    public static function setRelevantHeadersForOptionAPI(Response $response) {
+    public static function setRelevantHeadersForOptionAPI(Response $response)
+    {
         CookieAndHeader::setOptionsAPIHeader($response);
     }
 }

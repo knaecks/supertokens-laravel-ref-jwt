@@ -11,7 +11,8 @@ class JwtTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testCreateAndVerifyJWT_SameSigningKey() {
+    public function testCreateAndVerifyJWT_SameSigningKey()
+    {
         $payload = [
             'userId' => 'testing'
         ];
@@ -26,7 +27,8 @@ class JwtTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testCreateAndVerifyJWT_DifferentSigningKey() {
+    public function testCreateAndVerifyJWT_DifferentSigningKey()
+    {
         $payload = [
             'userId' => 'testing'
         ];

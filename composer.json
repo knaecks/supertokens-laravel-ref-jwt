@@ -30,6 +30,7 @@
         }
     },
     "require-dev": {
-        "orchestra/testbench": "^3.8"
+        "orchestra/testbench": "^3.8",
+        "friendsofphp/php-cs-fixer": "^2.16@dev"
     }
 }

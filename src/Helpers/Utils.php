@@ -8,7 +8,8 @@ use Ramsey\Uuid\Uuid;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 
-class Utils {
+class Utils
+{
 
     /**
      * @param $plaintext
@@ -16,7 +17,8 @@ class Utils {
      * @return string
      * @throws Exception
      */
-    public static function encrypt($plaintext, $masterkey) {
+    public static function encrypt($plaintext, $masterkey)
+    {
         $iv = random_bytes(16);
         $salt = random_bytes(64);
 
@@ -35,7 +37,8 @@ class Utils {
      * @param $masterkey
      * @return string
      */
-    public static function decrypt($encdata, $masterkey) {
+    public static function decrypt($encdata, $masterkey)
+    {
         $bData = base64_decode($encdata);
 
         $salt = substr($bData, 0, 64);
@@ -56,7 +59,8 @@ class Utils {
      * @param $toHash
      * @return string
      */
-    public static function hashString($toHash) {
+    public static function hashString($toHash)
+    {
         return hash("sha256", $toHash);
     }
 
@@ -64,7 +68,8 @@ class Utils {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    public static function generateUUID() {
+    public static function generateUUID()
+    {
         try {
             return Uuid::uuid1()->toString();
         } catch (Exception $e) {
@@ -76,7 +81,8 @@ class Utils {
      * @return string
      * @throws Exception
      */
-    public static function generateNewSigningKey() {
+    public static function generateNewSigningKey()
+    {
         $key = openssl_pbkdf2(random_bytes(64), random_bytes(64), 100, 32, "sha512");
         return base64_encode($key);
     }
@@ -86,7 +92,8 @@ class Utils {
      * @param $key
      * @return string
      */
-    public static function hmac($text, $key) {
+    public static function hmac($text, $key)
+    {
         return hash_hmac("sha256", $text, $key);
     }
 
@@ -94,7 +101,8 @@ class Utils {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    public static function generateSessionHandle() {
+    public static function generateSessionHandle()
+    {
         return Utils::generateUUID();
     }
 
@@ -102,7 +110,8 @@ class Utils {
      * @param $field
      * @return string|null
      */
-    public static function sanitizeStringInput($field) {
+    public static function sanitizeStringInput($field)
+    {
         if ($field === "") {
             return "";
         }
@@ -118,7 +127,8 @@ class Utils {
      * @param $field
      * @return string|null
      */
-    public static function sanitizeNumberInput($field) {
+    public static function sanitizeNumberInput($field)
+    {
         $type = gettype($field);
         if ($type === "integer" || $type === "double") {
             return $field;
@@ -135,7 +145,8 @@ class Utils {
      * @param $field
      * @return bool|null
      */
-    public static function sanitizeBooleanInput($field) {
+    public static function sanitizeBooleanInput($field)
+    {
         if ($field === true || $field === false) {
             return $field;
         }
@@ -152,7 +163,8 @@ class Utils {
      * @param $data
      * @return false|string
      */
-    public static function serializeData($data) {
+    public static function serializeData($data)
+    {
         if (!isset($data)) {
             return "";
         }
@@ -163,7 +175,8 @@ class Utils {
      * @param $data
      * @return mixed|null
      */
-    public static function unserializeData($data) {
+    public static function unserializeData($data)
+    {
         if ($data === "") {
             return null;
         }
@@ -174,7 +187,8 @@ class Utils {
      * @return int
      * @throws SuperTokensGeneralException
      */
-    public static function getDateTimeStamp() {
+    public static function getDateTimeStamp()
+    {
         try {
             return (new DateTime())->getTimestamp();
         } catch (Exception $e) {
@@ -186,7 +200,8 @@ class Utils {
      * @param $userId
      * @throws SuperTokensGeneralException
      */
-    public static function checkUserIdIsStringOrNumber($userId) {
+    public static function checkUserIdIsStringOrNumber($userId)
+    {
         if (!is_string($userId) && !is_numeric($userId)) {
             throw SuperTokensException::generateGeneralException("userId must be a string or a number");
         }
@@ -197,7 +212,8 @@ class Utils {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    public static function stringifyUserId($userId) {
+    public static function stringifyUserId($userId)
+    {
         Utils::checkUserIdIsStringOrNumber($userId);
         if (is_string($userId)) {
             $jsonFromUserId = json_decode($userId, true);
@@ -215,7 +231,8 @@ class Utils {
         ]);
     }
 
-    public static function parseUserIdToCorrectFormat($userId) {
+    public static function parseUserIdToCorrectFormat($userId)
+    {
         $id = json_decode($userId, true);
         if ($id === null || !is_array($id)) {
             return $userId;

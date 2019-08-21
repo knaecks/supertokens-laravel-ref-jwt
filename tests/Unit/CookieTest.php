@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use SuperTokens\Session\Helpers\CookieAndHeader;
 
-
-class CookieTest extends TestCase {
-
-    public function testSetCookie() {
+class CookieTest extends TestCase
+{
+    public function testSetCookie()
+    {
         $response = new Response();
 
         $key = 'test';
@@ -34,7 +34,8 @@ class CookieTest extends TestCase {
         $this->assertEquals($cookie->isHttpOnly(), $httpOnly);
     }
 
-    public function testGetCookie() {
+    public function testGetCookie()
+    {
         $key = 'test';
         $value = 'value';
 

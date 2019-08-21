@@ -13,7 +13,8 @@ use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Helpers\Jwt;
 use SuperTokens\Session\Helpers\AccessTokenSigningKey;
 
-class AccessToken {
+class AccessToken
+{
 
     /**
      * @param $token
@@ -21,8 +22,8 @@ class AccessToken {
      * @return array
      * @throws SuperTokensTryRefreshTokenException | SuperTokensGeneralException
      */
-    public static function getInfoFromAccessToken($token, $retry = true) {
-
+    public static function getInfoFromAccessToken($token, $retry = true)
+    {
         $key = AccessTokenSigningKey::getKey();
         try {
             try {
@@ -79,8 +80,8 @@ class AccessToken {
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $antiCsrfToken, $parentRefreshTokenHash1, $userPayload) {
-
+    public static function createNewAccessToken($sessionHandle, $userId, $refreshTokenHash1, $antiCsrfToken, $parentRefreshTokenHash1, $userPayload)
+    {
         try {
             $key = AccessTokenSigningKey::getKey();
             $validity = Config::get('supertokens.tokens.accessToken.validity');

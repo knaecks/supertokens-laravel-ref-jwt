@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Config;
 
 define("REFRESH_TOKEN_KEY_NAME_IN_DB", "refresh_token_key");
 
-class RefreshTokenSigningKey {
+class RefreshTokenSigningKey
+{
 
     /**
      * @var string
@@ -27,12 +28,15 @@ class RefreshTokenSigningKey {
     /**
      * RefreshTokenSigningKey constructor.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * @throws SuperTokensGeneralException
      */
-    public static function init() {
+    public static function init()
+    {
         if (!isset(RefreshTokenSigningKey::$instance)) {
             RefreshTokenSigningKey::$instance = new RefreshTokenSigningKey();
             RefreshTokenSigningKey::getKey();
@@ -43,7 +47,8 @@ class RefreshTokenSigningKey {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    public static function getKey() {
+    public static function getKey()
+    {
         if (!isset(RefreshTokenSigningKey::$instance)) {
             throw SuperTokensException::generateGeneralException('please call init function of refresh token key');
         }
@@ -55,7 +60,8 @@ class RefreshTokenSigningKey {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    private function getKeyFromInstance() {
+    private function getKeyFromInstance()
+    {
         if (!isset($instance->key)) {
             $this->key= $this->generateNewKeyAndUpdateInDb();
         }
@@ -66,7 +72,8 @@ class RefreshTokenSigningKey {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    private function generateNewKeyAndUpdateInDb() {
+    private function generateNewKeyAndUpdateInDb()
+    {
         $rollback = false;
         try {
             DB::beginTransaction();
@@ -95,7 +102,8 @@ class RefreshTokenSigningKey {
     /**
      * @throws SuperTokensGeneralException
      */
-    public static function resetInstance() {
+    public static function resetInstance()
+    {
         if (App::environment("testing")) {
             SigningKeyDb::removeKeyValueForKeyName(REFRESH_TOKEN_KEY_NAME_IN_DB);
             RefreshTokenSigningKey::$instance = null;

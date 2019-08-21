@@ -8,14 +8,16 @@ use SuperTokens\Session\Exceptions\SuperTokensGeneralException;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Models\SigningKeyModel;
 
-class SigningKeyDb {
+class SigningKeyDb
+{
 
     /**
      * @param $keyName
      * @return array|null
      * @throws SuperTokensGeneralException
      */
-    public static function getKeyValueFromKeyNameForUpdate($keyName) {
+    public static function getKeyValueFromKeyNameForUpdate($keyName)
+    {
         // check for transaction
         try {
             $result = SigningKeyModel::where('key_name', '=', $keyName)->lockForUpdate()->first();
@@ -37,7 +39,8 @@ class SigningKeyDb {
      * @param $createdAtTime
      * @throws SuperTokensGeneralException
      */
-    public static function insertKeyValueForKeyName_Transaction($keyName, $keyValue, $createdAtTime) {
+    public static function insertKeyValueForKeyName_Transaction($keyName, $keyValue, $createdAtTime)
+    {
         try {
             SigningKeyModel::updateOrInsert(
                 ['key_name' => $keyName],
@@ -52,7 +55,8 @@ class SigningKeyDb {
      * @param $keyName
      * @throws SuperTokensGeneralException
      */
-    public static function removeKeyValueForKeyName($keyName) {
+    public static function removeKeyValueForKeyName($keyName)
+    {
         if (App::environment("testing")) {
             try {
                 SigningKeyModel::where('key_name', '=', $keyName)->delete();

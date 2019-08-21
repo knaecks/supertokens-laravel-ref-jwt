@@ -16,13 +16,15 @@ use SuperTokens\Session\Exceptions\SuperTokensException;
 use SuperTokens\Session\Models\RefreshTokenModel;
 use SuperTokens\Session\Db\RefreshTokenDb;
 
-class SessionTest extends TestCase {
+class SessionTest extends TestCase
+{
     use RefreshDatabase;
 
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testNumericUserId() {
+    public function testNumericUserId()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -69,7 +71,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testNumberAsStringUserId() {
+    public function testNumberAsStringUserId()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -116,7 +119,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testValidJsonSingleFieldUserId() {
+    public function testValidJsonSingleFieldUserId()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -165,7 +169,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testValidJsonMultipleFieldsUserId() {
+    public function testValidJsonMultipleFieldsUserId()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -215,7 +220,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testInValidJsonUserId() {
+    public function testInValidJsonUserId()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -241,7 +247,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testCreateAndGetSessionWithAntiCsrf() {
+    public function testCreateAndGetSessionWithAntiCsrf()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -308,7 +315,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testCreateAndGetSessionWithAntiCsrfDisabled() {
+    public function testCreateAndGetSessionWithAntiCsrfDisabled()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.enableAntiCsrf', false);
@@ -371,7 +379,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testCreateAndGetSessionWithDifferentPayloadTypes() {
+    public function testCreateAndGetSessionWithDifferentPayloadTypes()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -433,7 +442,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testCreateAndGetSessionWhereAccessTokenExpiresAfterOneSec() {
+    public function testCreateAndGetSessionWhereAccessTokenExpiresAfterOneSec()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.validity', 1);
@@ -467,7 +477,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testCreateAndGetSessionWhereAccessTokenSigningKeyGetsUpdatedEveryTwoSec() {
+    public function testCreateAndGetSessionWhereAccessTokenSigningKeyGetsUpdatedEveryTwoSec()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.signingKey.updateInterval', 0.0005);
@@ -515,7 +526,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testAlteringOfPayload() {
+    public function testAlteringOfPayload()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -808,7 +820,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testRefreshSessionWithRefreshTokenValidityLessThanThreeSec() {
+    public function testRefreshSessionWithRefreshTokenValidityLessThanThreeSec()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.refreshToken.validity', 0.0008);
@@ -887,7 +900,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testRevokeAllSessionForUserWithoutBlacklisting() {
+    public function testRevokeAllSessionForUserWithoutBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -947,7 +961,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testRevokeAllSessionForUserWithBlacklisting() {
+    public function testRevokeAllSessionForUserWithBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.blacklisting', true);
@@ -996,7 +1011,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testUpdateSessionInfo() {
+    public function testUpdateSessionInfo()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -1028,7 +1044,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testRevokeSessionWithoutBlacklisting() {
+    public function testRevokeSessionWithoutBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
@@ -1077,7 +1094,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException  | Exception
      */
-    public function testRevokeSessionWithBlacklisting() {
+    public function testRevokeSessionWithBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.blacklisting', true);
@@ -1134,7 +1152,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testTokenTheftS1_R1_S2_R1() {
+    public function testTokenTheftS1_R1_S2_R1()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.blacklisting', true);
@@ -1183,7 +1202,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testTokenTheftS1_R1_R2_R1() {
+    public function testTokenTheftS1_R1_R2_R1()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.blacklisting', true);
@@ -1232,7 +1252,8 @@ class SessionTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testRemoveExpiredSessions() {
+    public function testRemoveExpiredSessions()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.refreshToken.validity', 0.0008);

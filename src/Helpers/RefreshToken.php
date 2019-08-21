@@ -11,15 +11,16 @@ use SuperTokens\Session\Exceptions\SuperTokensUnauthorizedException;
 use SuperTokens\Session\Helpers\Utils;
 use SuperTokens\Session\Helpers\RefreshTokenSigningKey;
 
-class RefreshToken {
+class RefreshToken
+{
 
     /**
      * @param $token
      * @return array
      * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
-    public static function getInfoFromRefreshToken($token) {
-
+    public static function getInfoFromRefreshToken($token)
+    {
         $key = RefreshTokenSigningKey::getKey();
         try {
             $splittedToken = explode(".", $token);
@@ -57,8 +58,8 @@ class RefreshToken {
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function createNewRefreshToken($sessionHandle, $userId, $parentRefreshTokenHash1) {
-
+    public static function createNewRefreshToken($sessionHandle, $userId, $parentRefreshTokenHash1)
+    {
         try {
             $key = RefreshTokenSigningKey::getKey();
             $nonce = Utils::hashString(Utils::generateUUID()); // hash of randomly generated UUID
@@ -83,7 +84,8 @@ class RefreshToken {
         }
     }
 
-    public static function getValidity() {
+    public static function getValidity()
+    {
         return (int)(Config::get('supertokens.tokens.refreshToken.validity') * 60 * 60);
     }
 }

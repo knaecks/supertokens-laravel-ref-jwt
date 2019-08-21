@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
  * @package SuperTokens\SessionHandlingFunctions\Models
  * @mixin Builder
  */
-class SigningKeyModel extends Model {
+class SigningKeyModel extends Model
+{
     protected $table = "signing_key";
 
     protected $primaryKey = 'key_name';

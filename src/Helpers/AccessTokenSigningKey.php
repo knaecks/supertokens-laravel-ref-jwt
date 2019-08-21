@@ -16,7 +16,8 @@ define("ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB", "access_token_signing_key");
  * Class AccessTokenSigningKey
  * @method userDefinedGet()
  */
-class AccessTokenSigningKey {
+class AccessTokenSigningKey
+{
 
     /**
      * @var AccessTokenSigningKey
@@ -51,7 +52,8 @@ class AccessTokenSigningKey {
     /**
      * AccessTokenSigningKey constructor.
      */
-    private function __construct() {
+    private function __construct()
+    {
         $this->isDynamic = Config::get('supertokens.tokens.accessToken.signingKey.dynamic');
         $this->updateInterval = Config::get('supertokens.tokens.accessToken.signingKey.updateInterval') * 60 * 60;
         $this->userDefinedGet = Config::get('supertokens.tokens.accessToken.signingKey.get');
@@ -60,7 +62,8 @@ class AccessTokenSigningKey {
     /**
      * @throws SuperTokensGeneralException
      */
-    public static function init() {
+    public static function init()
+    {
         if (!isset(AccessTokenSigningKey::$instance)) {
             AccessTokenSigningKey::$instance = new AccessTokenSigningKey();
             AccessTokenSigningKey::getKey();
@@ -71,7 +74,8 @@ class AccessTokenSigningKey {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    private function getKeyFromInstance() {
+    private function getKeyFromInstance()
+    {
         if (isset($this->userDefinedGet)) {
             try {
                 return call_user_func($this->userDefinedGet);
@@ -102,7 +106,8 @@ class AccessTokenSigningKey {
      * @return string
      * @throws SuperTokensGeneralException
      */
-    public static function getKey() {
+    public static function getKey()
+    {
         if (!isset(AccessTokenSigningKey::$instance)) {
             throw SuperTokensException::generateGeneralException("please call init function of access token signing key");
         }
@@ -114,7 +119,8 @@ class AccessTokenSigningKey {
      * @return array
      * @throws SuperTokensGeneralException
      */
-    private function maybeGenerateNewKeyAndUpdateInDb() {
+    private function maybeGenerateNewKeyAndUpdateInDb()
+    {
         $rollback = false;
         try {
             DB::beginTransaction();
@@ -154,7 +160,8 @@ class AccessTokenSigningKey {
     /**
      * @throws SuperTokensGeneralException
      */
-    public static function removeKeyFromMemory() {
+    public static function removeKeyFromMemory()
+    {
         if (!isset(AccessTokenSigningKey::$instance)) {
             throw SuperTokensException::generateGeneralException("please call init function of access token signing key");
         }
@@ -162,7 +169,8 @@ class AccessTokenSigningKey {
         AccessTokenSigningKey::$instance->removeKeyFromMemoryInInstance();
     }
 
-    private function removeKeyFromMemoryInInstance() {
+    private function removeKeyFromMemoryInInstance()
+    {
         $this->signingKey = null;
         $this->createdAtTime = null;
     }
@@ -170,7 +178,8 @@ class AccessTokenSigningKey {
     /**
      * @throws SuperTokensGeneralException
      */
-    public static function resetInstance() {
+    public static function resetInstance()
+    {
         if (App::environment("testing")) {
             SigningKeyDb::removeKeyValueForKeyName(ACCESS_TOKEN_SIGNING_KEY_NAME_IN_DB);
             AccessTokenSigningKey::$instance = null;

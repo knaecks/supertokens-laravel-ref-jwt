@@ -12,14 +12,16 @@ use SuperTokens\Session\Models\RefreshTokenModel;
  * Class RefreshTokenDb
  * @package SuperTokens\SessionHandlingFunctions\Db
  */
-class RefreshTokenDb {
+class RefreshTokenDb
+{
 
     /**
      * @param $sessionHandle
      * @return bool
      * @throws SuperTokensGeneralException
      */
-    public static function isSessionBlacklisted($sessionHandle) {
+    public static function isSessionBlacklisted($sessionHandle)
+    {
         try {
             $noOfRows = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->count();
             return $noOfRows === 0;
@@ -37,7 +39,8 @@ class RefreshTokenDb {
      * @param $jwtPayload
      * @throws SuperTokensGeneralException
      */
-    public static function createNewSessionInDB($sessionHandle, $userId, $refreshTokenHash2, $sessionData, $expiresAt, $jwtPayload) {
+    public static function createNewSessionInDB($sessionHandle, $userId, $refreshTokenHash2, $sessionData, $expiresAt, $jwtPayload)
+    {
         try {
             $userId = Utils::stringifyUserId($userId);
             $serialisedSessionInfo = Utils::serializeData($sessionData);
@@ -63,7 +66,8 @@ class RefreshTokenDb {
      * @return array|null
      * @throws SuperTokensGeneralException
      */
-    public static function getSessionInfoForUpdate($sessionHandle) {
+    public static function getSessionInfoForUpdate($sessionHandle)
+    {
         try {
             $result = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->lockForUpdate()->first();
             if ($result === null) {
@@ -89,7 +93,8 @@ class RefreshTokenDb {
      * @return int
      * @throws SuperTokensGeneralException
      */
-    public static function updateSessionInfo_Transaction($sessionHandle, $refreshTokenHash2, $sessionData, $expiresAt) {
+    public static function updateSessionInfo_Transaction($sessionHandle, $refreshTokenHash2, $sessionData, $expiresAt)
+    {
         try {
             $serialisedSessionInfo = Utils::serializeData($sessionData);
             if ($serialisedSessionInfo === false) {
@@ -111,7 +116,8 @@ class RefreshTokenDb {
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function getAllSessionHandlesForUser($userId) {
+    public static function getAllSessionHandlesForUser($userId)
+    {
         try {
             $userId = Utils::stringifyUserId($userId);
             $sessions = RefreshTokenModel::where('user_id', '=', $userId)->get();
@@ -130,7 +136,8 @@ class RefreshTokenDb {
      * @throws SuperTokensGeneralException
      * @return number
      */
-    public static function deleteSession($sessionHandle) {
+    public static function deleteSession($sessionHandle)
+    {
         try {
             return RefreshTokenModel::where('session_handle', '=', $sessionHandle)->delete();
         } catch (Exception $e) {
@@ -143,7 +150,8 @@ class RefreshTokenDb {
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function getSessionData($sessionHandle) {
+    public static function getSessionData($sessionHandle)
+    {
         try {
             $session = RefreshTokenModel::where('session_handle', '=', $sessionHandle)->first();
             if ($session === null) {
@@ -166,7 +174,8 @@ class RefreshTokenDb {
      * @return int
      * @throws SuperTokensGeneralException
      */
-    public static function updateSessionData($sessionHandle, $sessionData) {
+    public static function updateSessionData($sessionHandle, $sessionData)
+    {
         try {
             $serialisedSessionInfo = Utils::serializeData($sessionData);
             if ($serialisedSessionInfo === false) {
@@ -184,7 +193,8 @@ class RefreshTokenDb {
     /**
      *
      */
-    public static function removeOldSessions() {
+    public static function removeOldSessions()
+    {
         try {
             $currentTimestamp = Utils::getDateTimeStamp();
             return RefreshTokenModel::where('expires_at', '<=', $currentTimestamp)->delete();

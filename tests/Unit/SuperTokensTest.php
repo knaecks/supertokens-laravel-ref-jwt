@@ -16,15 +16,16 @@ use SuperTokens\Session\SessionHandlingFunctions;
 use SuperTokens\Session\SuperToken;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 
-class SuperTokensTest extends TestCase {
+class SuperTokensTest extends TestCase
+{
     use RefreshDatabase;
 
     /**
      * @throws SuperTokensException
      * @throws Exception
      */
-    public function testCreateGetAndRefreshSessionWithTokenTheftAndAntiCsrfAndCookiePath() {
-
+    public function testCreateGetAndRefreshSessionWithTokenTheftAndAntiCsrfAndCookiePath()
+    {
         $accessTokenPath = "/testing";
         $refreshTokenPath = "/renew";
         RefreshTokenSigningKey::resetInstance();
@@ -68,11 +69,11 @@ class SuperTokensTest extends TestCase {
                 $this->assertEquals($cookiePath, $accessTokenPath);
                 $sAccessTokenCookie = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $this->assertEquals($cookiePath, $refreshTokenPath);
                 $sRefreshTokenCookie = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $this->assertEquals($cookiePath, $accessTokenPath);
                 $sIdRefreshTokenCookie = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
@@ -138,13 +139,13 @@ class SuperTokensTest extends TestCase {
                 $sOldAccessTokenCookie = $sAccessTokenCookie;
                 $sAccessTokenCookie = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $this->assertNotEquals($sRefreshTokenCookie, $cookieValue);
                 $this->assertEquals($cookiePath, $refreshTokenPath);
                 $sOldRefreshTokenCookie = $sRefreshTokenCookie;
                 $sRefreshTokenCookie = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $this->assertNotEquals($sIdRefreshTokenCookie, $cookieValue);
                 $this->assertEquals($cookiePath, $accessTokenPath);
                 $sOldIdRefreshTokenCookie = $sIdRefreshTokenCookie;
@@ -209,12 +210,12 @@ class SuperTokensTest extends TestCase {
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $this->assertEquals($cookiePath, $refreshTokenPath);
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $this->assertEquals($cookiePath, $accessTokenPath);
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
@@ -231,8 +232,8 @@ class SuperTokensTest extends TestCase {
      * @throws SuperTokensException
      * @throws Exception
      */
-    public function testCreateGetAndRefreshSessionWithAntiCsrfDisabled() {
-
+    public function testCreateGetAndRefreshSessionWithAntiCsrfDisabled()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.signingKey.updateInterval', 0.0005);
@@ -270,10 +271,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }
@@ -333,12 +334,12 @@ class SuperTokensTest extends TestCase {
                 $sOldAccessTokenCookie = $sAccessTokenCookie;
                 $sAccessTokenCookie = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $this->assertNotEquals($sRefreshTokenCookie, $cookieValue);
                 $sOldRefreshTokenCookie = $sRefreshTokenCookie;
                 $sRefreshTokenCookie = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $this->assertNotEquals($sIdRefreshTokenCookie, $cookieValue);
                 $sOldIdRefreshTokenCookie = $sIdRefreshTokenCookie;
                 $sIdRefreshTokenCookie = $cookieValue;
@@ -387,11 +388,11 @@ class SuperTokensTest extends TestCase {
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sIdRefreshTokenCookieFound = true;
@@ -407,7 +408,8 @@ class SuperTokensTest extends TestCase {
      * @throws SuperTokensException
      * @throws Exception
      */
-    public function testRevokeSessionWithoutBlacklisting() {
+    public function testRevokeSessionWithoutBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SuperToken();
@@ -444,10 +446,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }
@@ -495,7 +497,8 @@ class SuperTokensTest extends TestCase {
      * @throws SuperTokensException
      * @throws Exception
      */
-    public function testRevokeSessionWithBlacklisting() {
+    public function testRevokeSessionWithBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.blacklisting', true);
@@ -533,10 +536,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }
@@ -588,7 +591,8 @@ class SuperTokensTest extends TestCase {
      * @throws SuperTokensException
      * @throws Exception
      */
-    public function testRefreshTokenExpired() {
+    public function testRefreshTokenExpired()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SuperToken();
@@ -625,10 +629,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }
@@ -680,11 +684,11 @@ class SuperTokensTest extends TestCase {
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $this->assertEquals("", $cookieValue);
                 $this->assertEquals(0, $cookieExpire);
                 $sIdRefreshTokenCookieFound = true;
@@ -700,7 +704,8 @@ class SuperTokensTest extends TestCase {
      * @throws SuperTokensException
      * @throws Exception
      */
-    public function testRevokeAllSessionsWithoutBlacklisting() {
+    public function testRevokeAllSessionsWithoutBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         new SuperToken();
@@ -734,10 +739,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie1 = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie1 = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie1 = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }
@@ -768,10 +773,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie2 = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie2 = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie2 = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }
@@ -850,7 +855,8 @@ class SuperTokensTest extends TestCase {
      * @throws SuperTokensException
      * @throws Exception
      */
-    public function testRevokeAllSessionsWithBlacklisting() {
+    public function testRevokeAllSessionsWithBlacklisting()
+    {
         RefreshTokenSigningKey::resetInstance();
         AccessTokenSigningKey::resetInstance();
         Config::set('supertokens.tokens.accessToken.blacklisting', true);
@@ -885,10 +891,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie1 = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie1 = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie1 = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }
@@ -919,10 +925,10 @@ class SuperTokensTest extends TestCase {
             if ($cookieName === "sAccessToken") {
                 $sAccessTokenCookie2 = $cookieValue;
                 $sAccessTokenCookieFound = true;
-            } else if ($cookieName === "sRefreshToken") {
+            } elseif ($cookieName === "sRefreshToken") {
                 $sRefreshTokenCookie2 = $cookieValue;
                 $sRefreshTokenCookieFound = true;
-            } else if ($cookieName === "sIdRefreshToken") {
+            } elseif ($cookieName === "sIdRefreshToken") {
                 $sIdRefreshTokenCookie2 = $cookieValue;
                 $sIdRefreshTokenCookieFound = true;
             }

@@ -10,13 +10,15 @@ use Exception;
 use SuperTokens\Session\Helpers\RefreshToken;
 use SuperTokens\Session\Exceptions\SuperTokensException;
 
-class RefreshTokenTest extends TestCase {
+class RefreshTokenTest extends TestCase
+{
     use RefreshDatabase;
 
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testCreateAndVerifyRefreshTokenSameSigningKey() {
+    public function testCreateAndVerifyRefreshTokenSameSigningKey()
+    {
         RefreshTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
 
@@ -37,7 +39,8 @@ class RefreshTokenTest extends TestCase {
     /**
      * @throws SuperTokensException | Exception
      */
-    public function testCreateAndVerifyRefreshTokenDifferentSigningKey() {
+    public function testCreateAndVerifyRefreshTokenDifferentSigningKey()
+    {
         RefreshTokenSigningKey::resetInstance();
         new SessionHandlingFunctions();
 

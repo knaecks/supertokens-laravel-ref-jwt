@@ -22,13 +22,15 @@ use SuperTokens\Session\Helpers\RefreshToken;
  * Class SessionHandlingFunctions
  * @package SuperTokens\SessionHandlingFunctions
  */
-class SessionHandlingFunctions {
+class SessionHandlingFunctions
+{
 
     /**
      * SessionHandlingFunctions constructor.
      * @throws Exception
      */
-    public function __construct() {
+    public function __construct()
+    {
         AccessTokenSigningKey::init();
         RefreshTokenSigningKey::init();
     }
@@ -40,7 +42,8 @@ class SessionHandlingFunctions {
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function createNewSession($userId, $jwtPayload, $sessionData) {
+    public static function createNewSession($userId, $jwtPayload, $sessionData)
+    {
         Utils::checkUserIdIsStringOrNumber($userId);
         $sessionHandle = Utils::generateSessionHandle();
         $refreshToken = RefreshToken::createNewRefreshToken($sessionHandle, $userId, null);
@@ -56,7 +59,7 @@ class SessionHandlingFunctions {
             $jwtPayload
         );
 
-       return [
+        return [
             'session' => [
                 'handle' => $sessionHandle,
                 'userId' => $userId,
@@ -84,7 +87,8 @@ class SessionHandlingFunctions {
      * @return array
      * @throws SuperTokensGeneralException | SuperTokensUnauthorizedException | SuperTokensTryRefreshTokenException
      */
-    public static function getSession($accessToken, $antiCsrfToken = null) {
+    public static function getSession($accessToken, $antiCsrfToken = null)
+    {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
         $sessionHandle = $accessTokenInfo['sessionHandle'];
 
@@ -127,7 +131,6 @@ class SessionHandlingFunctions {
 
             $promote = $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['parentRefreshTokenHash1']);
             if ($promote || $sessionInfo['refreshTokenHash2'] === Utils::hashString($accessTokenInfo['refreshTokenHash1'])) {
-
                 if ($promote) {
                     $validity = RefreshToken::getValidity();
                     $date = new DateTime();
@@ -166,7 +169,7 @@ class SessionHandlingFunctions {
             $rollback = false;
             DB::commit();
             throw SuperTokensException::generateUnauthorisedException("using access token whose refresh token is no more.");
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             if ($rollback) {
                 DB::rollBack();
             }
@@ -181,7 +184,8 @@ class SessionHandlingFunctions {
      * @throws SuperTokensUnauthorizedException
      * @throws SuperTokensTokenTheftException
      */
-    public static function refreshSession($refreshToken) {
+    public static function refreshSession($refreshToken)
+    {
         $refreshTokenInfo = RefreshToken::getInfoFromRefreshToken($refreshToken);
         return SessionHandlingFunctions::refreshSessionHelper($refreshToken, $refreshTokenInfo);
     }
@@ -194,7 +198,8 @@ class SessionHandlingFunctions {
      * @throws SuperTokensUnauthorizedException
      * @throws SuperTokensTokenTheftException
      */
-    public static function refreshSessionHelper($refreshToken, $refreshTokenInfo) {
+    public static function refreshSessionHelper($refreshToken, $refreshTokenInfo)
+    {
         $sessionHandle = $refreshTokenInfo['sessionHandle'];
         $rollback = false;
         try {
@@ -302,7 +307,8 @@ class SessionHandlingFunctions {
      * @param $userId
      * @throws SuperTokensGeneralException
      */
-    public static function revokeAllSessionsForUser($userId) {
+    public static function revokeAllSessionsForUser($userId)
+    {
         $sessionHandles = RefreshTokenDb::getAllSessionHandlesForUser($userId);
         for ($i = 0; $i < count($sessionHandles); $i++) {
             SessionHandlingFunctions::revokeSessionUsingSessionHandle($sessionHandles[$i]);
@@ -314,7 +320,8 @@ class SessionHandlingFunctions {
      * @return array
      * @throws SuperTokensGeneralException
      */
-    public static function getAllSessionHandlesForUser($userId) {
+    public static function getAllSessionHandlesForUser($userId)
+    {
         return RefreshTokenDb::getAllSessionHandlesForUser($userId);
     }
 
@@ -323,7 +330,8 @@ class SessionHandlingFunctions {
      * @return bool
      * @throws SuperTokensGeneralException
      */
-    public static function revokeSessionUsingSessionHandle($sessionHandle) {
+    public static function revokeSessionUsingSessionHandle($sessionHandle)
+    {
         return RefreshTokenDb::deleteSession($sessionHandle) === 1;
     }
 
@@ -333,7 +341,8 @@ class SessionHandlingFunctions {
      * @throws Exception
      * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
-    public static function getSessionData($sessionHandle) {
+    public static function getSessionData($sessionHandle)
+    {
         $result = RefreshTokenDb::getSessionData($sessionHandle);
         if (!$result['found']) {
             throw SuperTokensException::generateUnauthorisedException("session does not exist anymore");
@@ -346,7 +355,8 @@ class SessionHandlingFunctions {
      * @param $newSessionData
      * @throws SuperTokensUnauthorizedException | SuperTokensGeneralException
      */
-    public static function updateSessionData($sessionHandle, $newSessionData) {
+    public static function updateSessionData($sessionHandle, $newSessionData)
+    {
         $affected = RefreshTokenDb::updateSessionData($sessionHandle, $newSessionData);
         if ($affected !== 1) {
             throw SuperTokensException::generateUnauthorisedException("session does not exist anymore");

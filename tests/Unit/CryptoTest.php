@@ -10,7 +10,8 @@ class CryptoTest extends TestCase
     /**
      * @throws \Exception
      */
-    public function testEncryptDecrypt() {
+    public function testEncryptDecrypt()
+    {
         $plainText = "testing";
         $masterKey = "master";
 
