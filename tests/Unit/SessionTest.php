@@ -363,7 +363,7 @@ class SessionTest extends TestCase
         $noOfRows = RefreshTokenModel::all()->count();
         $this->assertEquals($noOfRows, 1);
 
-        $sessionObject = SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+        $sessionObject = SessionHandlingFunctions::getSession($newSession['accessToken']['value'], false);
         $this->assertIsArray($sessionObject);
         $this->assertArrayNotHasKey("newAccessToken", $sessionObject);
         $this->assertArrayHasKey("session", $sessionObject);
@@ -725,7 +725,7 @@ class SessionTest extends TestCase
 
         sleep(2);
         try {
-            SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession['accessToken']['value'], false);
             throw new Exception("test failed");
         } catch (SuperTokensTryRefreshTokenException $e) {
             $this->assertTrue(true);
@@ -765,7 +765,7 @@ class SessionTest extends TestCase
         $this->assertEquals($newRefreshedSession['session']['userId'], $userId);
         $this->assertEquals($newRefreshedSession['session']['jwtPayload'], $jwtPayload);
 
-        $sessionObject = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value']);
+        $sessionObject = SessionHandlingFunctions::getSession($newRefreshedSession['newAccessToken']['value'], false);
         $this->assertIsArray($sessionObject);
         $this->assertArrayHasKey("newAccessToken", $sessionObject);
         $this->assertArrayHasKey("value", $sessionObject['newAccessToken']);
@@ -783,7 +783,7 @@ class SessionTest extends TestCase
         $this->assertEquals($sessionObject['session']['userId'], $userId);
         $this->assertEquals($sessionObject['session']['jwtPayload'], $jwtPayload);
 
-        $newSessionObject = SessionHandlingFunctions::getSession($sessionObject['newAccessToken']['value']);
+        $newSessionObject = SessionHandlingFunctions::getSession($sessionObject['newAccessToken']['value'], false);
         $this->assertIsArray($newSessionObject);
         $this->assertArrayNotHasKey("newAccessToken", $newSessionObject);
         $this->assertArrayHasKey("session", $newSessionObject);
@@ -796,7 +796,7 @@ class SessionTest extends TestCase
 
         sleep(2);
         try {
-            SessionHandlingFunctions::getSession($newSession['accessToken']['value']);
+            SessionHandlingFunctions::getSession($newSession['accessToken']['value'], false);
             throw new Exception("test failed");
         } catch (SuperTokensTryRefreshTokenException $e) {
             $this->assertTrue(true);
@@ -810,7 +810,7 @@ class SessionTest extends TestCase
         $this->assertNotEquals($newRefreshedSession2['newAccessToken']['value'], $newSession['accessToken']['value']);
         $this->assertNotEquals($newRefreshedSession2['newAccessToken']['value'], $sessionObject['newAccessToken']['value']);
 
-        $sessionObject2 = SessionHandlingFunctions::getSession($newRefreshedSession2['newAccessToken']['value']);
+        $sessionObject2 = SessionHandlingFunctions::getSession($newRefreshedSession2['newAccessToken']['value'], false);
         $this->assertIsArray($sessionObject2);
         $this->assertArrayHasKey("session", $sessionObject2);
         $this->assertArrayHasKey("newAccessToken", $sessionObject2);
@@ -1031,13 +1031,13 @@ class SessionTest extends TestCase
         $this->assertArrayHasKey("handle", $newSession['session']);
         $this->assertIsString($newSession['session']['handle']);
 
-        $sessionInfoBeforeUpdate = SessionHandlingFunctions::getSessionInfo($newSession['session']['handle']);
+        $sessionInfoBeforeUpdate = SessionHandlingFunctions::getSessionInfo($newSession['session']['handle'], false);
         $this->assertEquals($sessionInfoBeforeUpdate, $sessionInfo);
 
         $newSessionInfo = 2;
         SessionHandlingFunctions::updateSessionInfo($newSession['session']['handle'], $newSessionInfo);
 
-        $sessionInfoPostUpdate = SessionHandlingFunctions::getSessionInfo($newSession['session']['handle']);
+        $sessionInfoPostUpdate = SessionHandlingFunctions::getSessionInfo($newSession['session']['handle'], false);
         $this->assertEquals($sessionInfoPostUpdate, $newSessionInfo);
     }
 

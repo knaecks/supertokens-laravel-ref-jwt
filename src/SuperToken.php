@@ -73,6 +73,7 @@ class SuperToken
             if ($antiCsrfToken === null && $enableCsrfProtection) {
                 throw SuperTokensException::generateTryRefreshTokenException("anti csrf token is missing");
             }
+            $antiCsrfToken = $antiCsrfToken === null? false : $antiCsrfToken;
             $newSession = SessionHandlingFunctions::getSession($accessToken, $antiCsrfToken);
             if (isset($newSession['newAccessToken'])) {
                 CookieAndHeader::attachAccessTokenToCookie($response, $newSession['newAccessToken']['value'], $newSession['newAccessToken']['expires']);

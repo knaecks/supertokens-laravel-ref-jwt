@@ -87,16 +87,15 @@ class SessionHandlingFunctions
      * @return array
      * @throws SuperTokensGeneralException | SuperTokensUnauthorizedException | SuperTokensTryRefreshTokenException
      */
-    public static function getSession($accessToken, $antiCsrfToken = null)
+    public static function getSession($accessToken, $antiCsrfToken)
     {
         $accessTokenInfo = AccessToken::getInfoFromAccessToken($accessToken);
         $sessionHandle = $accessTokenInfo['sessionHandle'];
 
-        $antiCsrfToken = Config::get("supertokens.tokens.enableAntiCsrf") ? $antiCsrfToken : null;
-        if ($antiCsrfToken !== null) {
-            if ($antiCsrfToken !== $accessTokenInfo['antiCsrfToken']) {
-                throw SuperTokensException::generateTryRefreshTokenException("anti-csrf check failed");
-            }
+        $antiCsrfToken = Config::get("supertokens.tokens.enableAntiCsrf") ? $antiCsrfToken : false;
+        if (!isset($antiCsrfToken)) {
+        } elseif ($antiCsrfToken !== false && $antiCsrfToken !== $accessTokenInfo['antiCsrfToken']) {
+            throw SuperTokensException::generateTryRefreshTokenException("anti-csrf check failed");
         }
 
         $blacklisting = Config::get('supertokens.tokens.accessToken.blacklisting');
