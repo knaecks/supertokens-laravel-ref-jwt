@@ -35,7 +35,6 @@ class SuperToken
      */
     public static function createNewSession(Response $response, $userId, $jwtPayload = null, $sessionInfo = null)
     {
-        CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $newSession = SessionHandlingFunctions::createNewSession($userId, $jwtPayload, $sessionInfo);
 
         CookieAndHeader::attachAccessTokenToCookie($response, $newSession['accessToken']['value'], $newSession['accessToken']['expires']);
@@ -56,7 +55,6 @@ class SuperToken
      */
     public static function getSession(Request $request, Response $response, $enableCsrfProtection)
     {
-        CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
 
         if (!isset($idRefreshToken) || $idRefreshToken === null) {
@@ -97,7 +95,6 @@ class SuperToken
  */
     public static function refreshSession(Request $request, Response $response)
     {
-        CookieAndHeader::setHeader($response, "Access-Control-Allow-Credentials", "true");
         $refreshToken = CookieAndHeader::getRefreshTokenFromCookie($request);
         $idRefreshToken = CookieAndHeader::getIdRefreshTokenFromCookie($request);
         if (!isset($refreshToken) || !isset($idRefreshToken)) {
