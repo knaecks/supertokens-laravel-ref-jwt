@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-08-23
+### Changed
+- Deprecated getSessionData and changed added getSessionInfo instead.
+- Did the same for updateSessionData
+
 ## [1.0.1] - 2019-08-14
 ### Changed
 - code fix

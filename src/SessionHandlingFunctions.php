@@ -94,6 +94,7 @@ class SessionHandlingFunctions
 
         $antiCsrfToken = Config::get("supertokens.tokens.enableAntiCsrf") ? $antiCsrfToken : false;
         if (!isset($antiCsrfToken)) {
+            throw SuperTokensException::generateGeneralException("provided antiCsrfToken is not set. Please pass false instead");
         } elseif ($antiCsrfToken !== false && $antiCsrfToken !== $accessTokenInfo['antiCsrfToken']) {
             throw SuperTokensException::generateTryRefreshTokenException("anti-csrf check failed");
         }

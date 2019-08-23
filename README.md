@@ -42,7 +42,11 @@ Coming Soon.
 Please see our [Contributing](https://github.com/supertokens/supertokens-laravel-ref-jwt/blob/master/CONTRIBUTING.md) guide
 
 ## Tests
-TODO.
+To test this library, you need Laravel and any one of its supported databases running on your system.
+```
+composer install --dev
+make test
+```
 See our [Contributing](https://github.com/supertokens/supertokens-laravel-ref-jwt/blob/master/CONTRIBUTING.md) guide for more information.
 
 ## Support, questions and bugs
